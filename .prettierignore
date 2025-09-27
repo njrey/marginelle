@@ -1,0 +1,13 @@
+# dependencies & build
+node_modules
+.pnpm-store
+**/dist
+**/build
+**/.next
+**/.turbo
+coverage
+
+# generated artifacts (tune to taste)
+**/drizzle/migrations
+**/openapi.json
+**/packages/openapi-client/src
