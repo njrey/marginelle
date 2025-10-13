@@ -11,3 +11,6 @@ coverage
 **/drizzle/migrations
 **/openapi.json
 **/packages/openapi-client/src
+
+# Tanstack Generated Route
+apps/web/src/routeTree.gen.ts
