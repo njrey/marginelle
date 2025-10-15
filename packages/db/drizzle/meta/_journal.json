@@ -8,6 +8,13 @@
       "when": 1758679279785,
       "tag": "0000_milky_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1760539666631,
+      "tag": "0001_bizarre_toad",
+      "breakpoints": true
     }
   ]
 }

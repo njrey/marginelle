@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param } from "@nestjs/common";
 import { BooksService } from "./books.service";
 
 export class CreateBookDto {
@@ -10,6 +10,7 @@ export class CreateBookDto {
 export class BooksController {
   constructor(private svc: BooksService) { }
   @Get() list() { return this.svc.list(); }
+  @Get(":id") findOne(@Param("id") id: string) { return this.svc.findOne(id); }
   @Post() create(@Body() createBookDto: CreateBookDto) {
     return this.svc.create(createBookDto);
   }

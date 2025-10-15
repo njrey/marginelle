@@ -23,7 +23,13 @@ function BooksListPage() {
       <ul className="list-disc pl-6">
         {data?.map(book => (
           <li key={book.id}>
-            <strong>{book.title}</strong>
+            <Link
+              to="/books/$bookId"
+              params={{ bookId: book.id }}
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              <strong>{book.title}</strong>
+            </Link>
             {book.author && <span> by {book.author}</span>}
           </li>
         ))}
