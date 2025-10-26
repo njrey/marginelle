@@ -5,19 +5,19 @@ import { useCreateRelationship } from '@/hooks/use-relationships'
 import { useNotes } from '@/hooks/use-notes'
 import { useNavigate } from '@tanstack/react-router'
 import { createRelationshipSchema, type CreateRelationshipFormData } from '@/lib/schemas'
-import { RELATIONSHIP_TYPES } from '@/lib/api'
+//import { RELATIONSHIP_TYPES } from '@/lib/api'
 
-const RELATIONSHIP_TYPE_LABELS: Record<string, string> = {
-  impacts: 'Impacts',
-  member_of: 'Member Of',
-  ally: 'Ally',
-  enemy: 'Enemy',
-  family: 'Family',
-  friend: 'Friend',
-  owns: 'Owns',
-  located_in: 'Located In',
-  causes: 'Causes',
-}
+//const RELATIONSHIP_TYPE_LABELS: Record<string, string> = {
+//  impacts: 'Impacts',
+//  member_of: 'Member Of',
+//  ally: 'Ally',
+//  enemy: 'Enemy',
+//  family: 'Family',
+//  friend: 'Friend',
+//  owns: 'Owns',
+//  located_in: 'Located In',
+//  causes: 'Causes',
+//}
 
 interface RelationshipFormProps {
   bookId: string
@@ -111,11 +111,13 @@ export function RelationshipForm({ bookId }: RelationshipFormProps) {
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Select relationship type...</option>
-          {Object.entries(RELATIONSHIP_TYPES).map(([key, value]) => (
-            <option key={value} value={value}>
-              {RELATIONSHIP_TYPE_LABELS[value] || value}
-            </option>
-          ))}
+          {
+            //    Object.entries(RELATIONSHIP_TYPES).map(([key, value]) => (
+            //    <option key={value} value={value}>
+            //      {RELATIONSHIP_TYPE_LABELS[value] || value}
+            //    </option>
+            //  ))
+          }
         </select>
         {errors.relationshipType && (
           <p className="text-red-600 text-sm mt-1">{errors.relationshipType.message}</p>

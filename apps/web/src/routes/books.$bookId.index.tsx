@@ -1,12 +1,27 @@
-import { createFileRoute, getRouteApi } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { useStore } from '@livestore/react'
+import { queryDb } from '@livestore/livestore'
+import { tables } from '@/livestore/schema'
 
 export const Route = createFileRoute('/books/$bookId/')({
   component: BookDetailIndexPage,
 })
 
 function BookDetailIndexPage() {
-  const parentRoute = getRouteApi('/books/$bookId')
-  const { book } = parentRoute.useLoaderData()
+  const { bookId } = Route.useParams()
+  const { store } = useStore()
+
+  // Query the same book - LiveStore will reuse the reactive query from parent
+  const book$ = queryDb(
+    () => tables.books.where({ id: bookId, deletedAt: null }).first(),
+    { label: `book-${bookId}` }
+  )
+
+  const book = store.useQuery(book$)
+
+  if (!book) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div>

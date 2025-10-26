@@ -1,12 +1,13 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { useCreateBook } from '@/hooks/use-books'
+import { useStore } from '@livestore/react'
+import { events } from '@/livestore/schema'
 import { useNavigate } from '@tanstack/react-router'
 import { createBookSchema, type CreateBookFormData } from '@/lib/schemas'
 
 export function BookForm() {
-  const createBookMutation = useCreateBook()
+  const { store } = useStore()
   const navigate = useNavigate()
 
   const {
@@ -24,10 +25,15 @@ export function BookForm() {
 
   const onSubmit = async (data: CreateBookFormData) => {
     try {
-      await createBookMutation.mutate({
-        title: data.title,
-        author: data.author || undefined,
-      })
+      // Commit the BookCreated event to LiveStore
+      store.commit(
+        events.bookCreated({
+          id: crypto.randomUUID(),
+          title: data.title,
+          author: data.author || null,
+          createdAt: Date.now(),
+        })
+      )
 
       reset()
       navigate({ to: '/books/list' })

@@ -45,7 +45,7 @@ function BookDetailLayout() {
         </nav>
       </div>
       {book.author && <p className="text-gray-600 mb-4">by {book.author}</p>}
-      <Outlet context={{ book }} />
+      <Outlet />
     </div>
   )
 }

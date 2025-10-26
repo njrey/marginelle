@@ -1,7 +1,6 @@
 import React from 'react'
 import "./index.css"
 import ReactDOM from 'react-dom/client'
-import LiveStoreSharedWorker from '@livestore/adapter-web/shared-worker?sharedworker'
 import { makePersistedAdapter } from '@livestore/adapter-web'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -10,7 +9,8 @@ import { LiveStoreProvider } from '@livestore/react'
 import { routeTree } from './routeTree.gen'
 import { schema } from './livestore/schema'
 
-import LiveStoreWorker from './livestore.worker?worker'
+import LiveStoreWorker from './livestore/livestore.worker?worker'
+import LiveStoreSharedWorker from '@livestore/adapter-web/shared-worker?sharedworker'
 
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 

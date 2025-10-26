@@ -81,17 +81,17 @@ export const NOTE_TYPES = {
   CONCEPT: "concept",
 } as const;
 
-export const RELATIONSHIP_TYPES = {
-  IMPACTS: "impacts",
-  MEMBER_OF: "member_of",
-  ALLY: "ally",
-  ENEMY: "enemy",
-  FAMILY: "family",
-  FRIEND: "friend",
-  OWNS: "owns",
-  LOCATED_IN: "located_in",
-  CAUSES: "causes",
-} as const;
+//export const RELATIONSHIP_TYPES = {
+//  IMPACTS: "impacts",
+//  MEMBER_OF: "member_of",
+//  ALLY: "ally",
+//  ENEMY: "enemy",
+//  FAMILY: "family",
+//  FRIEND: "friend",
+//  OWNS: "owns",
+//  LOCATED_IN: "located_in",
+//  CAUSES: "causes",
+//} as const;
 
 export type NoteType = typeof NOTE_TYPES[keyof typeof NOTE_TYPES];
-export type RelationshipType = typeof RELATIONSHIP_TYPES[keyof typeof RELATIONSHIP_TYPES];
+//export type RelationshipType = typeof RELATIONSHIP_TYPES[keyof typeof RELATIONSHIP_TYPES];
