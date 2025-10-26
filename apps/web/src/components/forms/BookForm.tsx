@@ -24,7 +24,7 @@ export function BookForm() {
 
   const onSubmit = async (data: CreateBookFormData) => {
     try {
-      await createBookMutation.mutateAsync({
+      await createBookMutation.mutate({
         title: data.title,
         author: data.author || undefined,
       })
@@ -33,6 +33,7 @@ export function BookForm() {
       navigate({ to: '/books/list' })
     } catch (error) {
       console.error('Failed to create book:', error)
+      // With LiveStore, errors are typically validation errors from Effect Schema
     }
   }
 
@@ -73,9 +74,9 @@ export function BookForm() {
       <div className="flex gap-2">
         <Button
           type="submit"
-          disabled={isSubmitting || createBookMutation.isPending}
+          disabled={isSubmitting}
         >
-          {isSubmitting || createBookMutation.isPending ? 'Creating...' : 'Create Book'}
+          {isSubmitting ? 'Creating...' : 'Create Book'}
         </Button>
 
         <Button
@@ -86,12 +87,6 @@ export function BookForm() {
           Cancel
         </Button>
       </div>
-
-      {createBookMutation.isError && (
-        <p className="text-red-600 text-sm">
-          Failed to create book. Please try again.
-        </p>
-      )}
     </form>
   )
 }

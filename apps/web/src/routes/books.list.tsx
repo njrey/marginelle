@@ -1,17 +1,25 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { useBooks } from '@/hooks/use-books'
+import { tables } from '@/livestore/schema'
+import { queryDb } from '@livestore/livestore'
+import { useStore } from '@livestore/react'
 
 export const Route = createFileRoute('/books/list')({
   component: BooksListPage,
 })
 
+const books$ = queryDb(
+  () => {
+    return tables.books.where({
+      deletedAt: null,
+    })
+  },
+  { label: 'visibleTodos' },
+)
 function BooksListPage() {
-  const { data, isLoading, error } = useBooks()
 
-  if (isLoading) return <div>Loading books...</div>
-  if (error) return <div>Error loading books: {error.message}</div>
-
+  const { store } = useStore()
+  const books = store.useQuery(books$)
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -21,7 +29,7 @@ function BooksListPage() {
         </Button>
       </div>
       <ul className="list-disc pl-6">
-        {data?.map(book => (
+        {books?.map(book => (
           <li key={book.id}>
             <Link
               to="/books/$bookId"

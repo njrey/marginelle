@@ -1,16 +1,28 @@
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
-import { getBook } from '@/lib/api'
+import { useStore } from '@livestore/react'
+import { queryDb } from '@livestore/livestore'
+import { tables } from '@/livestore/schema'
 
 export const Route = createFileRoute('/books/$bookId')({
-  loader: async ({ params }) => {
-    const book = await getBook(params.bookId)
-    return { book }
-  },
   component: BookDetailLayout,
 })
 
 function BookDetailLayout() {
-  const { book } = Route.useLoaderData()
+  const { bookId } = Route.useParams()
+  const { store } = useStore()
+
+  // Query for a single book by ID from local SQLite
+  const book$ = queryDb(
+    () => tables.books.where({ id: bookId, deletedAt: null }).first(),
+    { label: `book-${bookId}` }
+  )
+
+  const book = store.useQuery(book$)
+
+  // Handle loading/not found states
+  if (!book) {
+    return <div>Book not found or loading...</div>
+  }
 
   return (
     <div>
