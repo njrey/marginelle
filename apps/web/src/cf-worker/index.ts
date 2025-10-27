@@ -10,10 +10,10 @@ export class WebSocketServer extends makeDurableObject({
 }) { }
 
 export default makeWorker({
-  validatePayload: (payload: any) => {
-    if (payload?.authToken !== 'insecure-token-change-me') {
-      throw new Error('Invalid auth token')
-    }
-  },
+  // validatePayload: (payload: any) => {
+  //   if (payload?.authToken !== 'insecure-token-change-me') {
+  //     throw new Error('Invalid auth token')
+  //   }
+  // },
   enableCORS: true,
 })

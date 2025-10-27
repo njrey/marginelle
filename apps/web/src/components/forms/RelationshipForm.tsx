@@ -1,38 +1,44 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { useCreateRelationship } from '@/hooks/use-relationships'
-import { useNotes } from '@/hooks/use-notes'
+import { useStore } from '@livestore/react'
+import { queryDb } from '@livestore/livestore'
+import { events, tables } from '@/livestore/schema'
 import { useNavigate } from '@tanstack/react-router'
 import { createRelationshipSchema, type CreateRelationshipFormData } from '@/lib/schemas'
-//import { RELATIONSHIP_TYPES } from '@/lib/api'
 
-//const RELATIONSHIP_TYPE_LABELS: Record<string, string> = {
-//  impacts: 'Impacts',
-//  member_of: 'Member Of',
-//  ally: 'Ally',
-//  enemy: 'Enemy',
-//  family: 'Family',
-//  friend: 'Friend',
-//  owns: 'Owns',
-//  located_in: 'Located In',
-//  causes: 'Causes',
-//}
+const RELATIONSHIP_TYPES = [
+  { value: 'impacts', label: 'Impacts' },
+  { value: 'member_of', label: 'Member Of' },
+  { value: 'ally', label: 'Ally' },
+  { value: 'enemy', label: 'Enemy' },
+  { value: 'family', label: 'Family' },
+  { value: 'friend', label: 'Friend' },
+  { value: 'owns', label: 'Owns' },
+  { value: 'located_in', label: 'Located In' },
+  { value: 'causes', label: 'Causes' },
+]
 
 interface RelationshipFormProps {
   bookId: string
 }
 
 export function RelationshipForm({ bookId }: RelationshipFormProps) {
+  const { store } = useStore()
   const navigate = useNavigate()
-  const { data: notes, isLoading: notesLoading } = useNotes(bookId)
+
+  // Query notes for this book from LiveStore
+  const notes$ = queryDb(
+    () => tables.notes.where({ bookId, deletedAt: null }),
+    { label: `notes-for-book-${bookId}` }
+  )
+  const notes = store.useQuery(notes$)
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    watch,
   } = useForm<CreateRelationshipFormData>({
     resolver: zodResolver(createRelationshipSchema),
     defaultValues: {
@@ -43,30 +49,25 @@ export function RelationshipForm({ bookId }: RelationshipFormProps) {
     },
   })
 
-  const fromNoteId = watch('fromNoteId')
-
-  // Use the mutation hook with the fromNoteId from the form
-  // We'll need to get it dynamically during submission
-  const createRelationshipMutation = useCreateRelationship(bookId, fromNoteId || '')
-
   const onSubmit = async (data: CreateRelationshipFormData) => {
     try {
-      // Create a new mutation with the actual fromNoteId
-      await createRelationshipMutation.mutateAsync({
-        toNoteId: data.toNoteId,
-        relationshipType: data.relationshipType,
-        description: data.description || undefined,
-      })
+      // Commit the RelationshipCreated event to LiveStore
+      store.commit(
+        events.relationshipCreated({
+          id: crypto.randomUUID(),
+          fromNoteId: data.fromNoteId,
+          toNoteId: data.toNoteId,
+          relationshipType: data.relationshipType as any, // Type is validated by zod schema
+          description: data.description || null,
+          createdAt: Date.now(),
+        })
+      )
 
       reset()
       navigate({ to: '/books/$bookId/notes', params: { bookId } })
     } catch (error) {
       console.error('Failed to create relationship:', error)
     }
-  }
-
-  if (notesLoading) {
-    return <div>Loading notes...</div>
   }
 
   if (!notes || notes.length < 2) {
@@ -111,13 +112,11 @@ export function RelationshipForm({ bookId }: RelationshipFormProps) {
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Select relationship type...</option>
-          {
-            //    Object.entries(RELATIONSHIP_TYPES).map(([key, value]) => (
-            //    <option key={value} value={value}>
-            //      {RELATIONSHIP_TYPE_LABELS[value] || value}
-            //    </option>
-            //  ))
-          }
+          {RELATIONSHIP_TYPES.map((type) => (
+            <option key={type.value} value={type.value}>
+              {type.label}
+            </option>
+          ))}
         </select>
         {errors.relationshipType && (
           <p className="text-red-600 text-sm mt-1">{errors.relationshipType.message}</p>
@@ -164,9 +163,9 @@ export function RelationshipForm({ bookId }: RelationshipFormProps) {
       <div className="flex gap-2">
         <Button
           type="submit"
-          disabled={isSubmitting || createRelationshipMutation.isPending}
+          disabled={isSubmitting}
         >
-          {isSubmitting || createRelationshipMutation.isPending ? 'Creating...' : 'Create Relationship'}
+          {isSubmitting ? 'Creating...' : 'Create Relationship'}
         </Button>
 
         <Button
@@ -177,12 +176,6 @@ export function RelationshipForm({ bookId }: RelationshipFormProps) {
           Cancel
         </Button>
       </div>
-
-      {createRelationshipMutation.isError && (
-        <p className="text-red-600 text-sm">
-          Failed to create relationship. Please try again.
-        </p>
-      )}
     </form>
   )
 }

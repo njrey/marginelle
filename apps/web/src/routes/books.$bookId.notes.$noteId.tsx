@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useNote } from '@/hooks/use-notes'
-import { useRelationships } from '@/hooks/use-relationships'
+import { useStore } from '@livestore/react'
+import { queryDb } from '@livestore/livestore'
+import { tables, type Note } from '@/livestore/schema'
 
 export const Route = createFileRoute('/books/$bookId/notes/$noteId')({
   component: NoteDetailPage,
@@ -8,16 +9,43 @@ export const Route = createFileRoute('/books/$bookId/notes/$noteId')({
 
 function NoteDetailPage() {
   const { bookId, noteId } = Route.useParams()
-  const { data: note, isLoading: noteLoading, error: noteError } = useNote(bookId, noteId)
-  const { data: relationships, isLoading: relationshipsLoading, error: relationshipsError } = useRelationships(bookId, noteId)
+  const { store } = useStore()
 
-  if (noteLoading) return <div>Loading note...</div>
-  if (noteError) return <div className="text-red-600">Error loading note: {noteError.message}</div>
+  // Query the note
+  const note$ = queryDb(
+    () => tables.notes.where({ id: noteId, deletedAt: null }).first(),
+    { label: `note-${noteId}` }
+  )
+  const note = store.useQuery(note$)
+
+  // Query all notes for this book (to populate relationship data)
+  const allNotes$ = queryDb(
+    () => tables.notes.where({ bookId, deletedAt: null }),
+    { label: `notes-for-book-${bookId}` }
+  )
+  const allNotes = store.useQuery(allNotes$)
+
+  // Query relationships for this note
+  const relationships$ = queryDb(
+    () => tables.noteRelationships.where({ deletedAt: null }),
+    { label: `relationships-for-note-${noteId}` }
+  )
+  const allRelationships = store.useQuery(relationships$)
+
   if (!note) return <div className="text-red-600">Note not found</div>
 
-  // Separate relationships into outgoing (from this note) and incoming (to this note)
-  const outgoingRelationships = relationships?.filter(r => r.fromNoteId === noteId) || []
-  const incomingRelationships = relationships?.filter(r => r.toNoteId === noteId) || []
+  // Filter relationships for this note and populate with note data
+  const noteMap = new Map(allNotes?.map(n => [n.id, n]) || [])
+
+  const outgoingRelationships = (allRelationships || [])
+    .filter(r => r.fromNoteId === noteId)
+    .map(r => ({ ...r, toNote: noteMap.get(r.toNoteId) }))
+    .filter(r => r.toNote) as Array<typeof allRelationships[0] & { toNote: Note }>
+
+  const incomingRelationships = (allRelationships || [])
+    .filter(r => r.toNoteId === noteId)
+    .map(r => ({ ...r, fromNote: noteMap.get(r.fromNoteId) }))
+    .filter(r => r.fromNote) as Array<typeof allRelationships[0] & { fromNote: Note }>
 
   return (
     <div className="space-y-6">
@@ -53,13 +81,8 @@ function NoteDetailPage() {
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">Relationships</h3>
 
-        {relationshipsLoading && <div>Loading relationships...</div>}
-        {relationshipsError && <div className="text-red-600">Error loading relationships: {relationshipsError.message}</div>}
-
-        {!relationshipsLoading && !relationshipsError && (
-          <>
-            {/* Outgoing Relationships */}
-            {outgoingRelationships.length > 0 && (
+        {/* Outgoing Relationships */}
+        {outgoingRelationships.length > 0 && (
               <div>
                 <h4 className="text-lg font-medium text-gray-700 mb-2">From this note:</h4>
                 <div className="space-y-2">
@@ -120,13 +143,11 @@ function NoteDetailPage() {
               </div>
             )}
 
-            {/* No Relationships */}
-            {outgoingRelationships.length === 0 && incomingRelationships.length === 0 && (
-              <div className="text-gray-500 text-center py-4">
-                No relationships yet for this note.
-              </div>
-            )}
-          </>
+        {/* No Relationships */}
+        {outgoingRelationships.length === 0 && incomingRelationships.length === 0 && (
+          <div className="text-gray-500 text-center py-4">
+            No relationships yet for this note.
+          </div>
         )}
       </div>
     </div>

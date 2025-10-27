@@ -1,7 +1,8 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { useCreateNote } from '@/hooks/use-notes'
+import { useStore } from '@livestore/react'
+import { events } from '@/livestore/schema'
 import { useNavigate } from '@tanstack/react-router'
 import { createNoteSchema, type CreateNoteFormData } from '@/lib/schemas'
 
@@ -19,7 +20,7 @@ interface NoteFormProps {
 }
 
 export function NoteForm({ bookId }: NoteFormProps) {
-  const createNoteMutation = useCreateNote(bookId)
+  const { store } = useStore()
   const navigate = useNavigate()
 
   const {
@@ -38,11 +39,21 @@ export function NoteForm({ bookId }: NoteFormProps) {
 
   const onSubmit = async (data: CreateNoteFormData) => {
     try {
-      await createNoteMutation.mutateAsync({
-        type: data.type,
-        title: data.title,
-        content: data.content || undefined,
-      })
+      const now = Date.now()
+
+      // Commit the NoteCreated event to LiveStore
+      store.commit(
+        events.noteCreated({
+          id: crypto.randomUUID(),
+          bookId,
+          type: data.type as any, // Type is validated by zod schema
+          title: data.title,
+          content: data.content || null,
+          metadata: null,
+          createdAt: now,
+          updatedAt: now,
+        })
+      )
 
       reset()
       navigate({ to: '/books/$bookId/notes', params: { bookId } })
@@ -109,9 +120,9 @@ export function NoteForm({ bookId }: NoteFormProps) {
       <div className="flex gap-2">
         <Button
           type="submit"
-          disabled={isSubmitting || createNoteMutation.isPending}
+          disabled={isSubmitting}
         >
-          {isSubmitting || createNoteMutation.isPending ? 'Creating...' : 'Create Note'}
+          {isSubmitting ? 'Creating...' : 'Create Note'}
         </Button>
 
         <Button
@@ -122,12 +133,6 @@ export function NoteForm({ bookId }: NoteFormProps) {
           Cancel
         </Button>
       </div>
-
-      {createNoteMutation.isError && (
-        <p className="text-red-600 text-sm">
-          Failed to create note. Please try again.
-        </p>
-      )}
     </form>
   )
 }

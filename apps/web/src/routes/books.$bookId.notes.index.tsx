@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useNotes } from '@/hooks/use-notes'
+import { useStore } from '@livestore/react'
+import { queryDb } from '@livestore/livestore'
+import { tables } from '@/livestore/schema'
 
 export const Route = createFileRoute('/books/$bookId/notes/')({
   component: NotesListPage,
@@ -7,10 +9,13 @@ export const Route = createFileRoute('/books/$bookId/notes/')({
 
 function NotesListPage() {
   const { bookId } = Route.useParams()
-  const { data: notes, isLoading, error } = useNotes(bookId)
+  const { store } = useStore()
 
-  if (isLoading) return <div>Loading notes...</div>
-  if (error) return <div className="text-red-600">Error loading notes: {error.message}</div>
+  const notes$ = queryDb(
+    () => tables.notes.where({ bookId, deletedAt: null }),
+    { label: `notes-for-book-${bookId}` }
+  )
+  const notes = store.useQuery(notes$)
 
   if (!notes || notes.length === 0) {
     return (

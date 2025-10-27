@@ -2,28 +2,28 @@
 Book-notes app to help readers keep track of characters, events, organizations, and relationships
 ## Reasoning
 This app is mostly a place to learn some technologies that I'm not as familiar with. As a full stack developer, I work daily with front-end frameworks and api frameworks. I have the opportunity to work with Python (FastAPI) quite often, and for front-end, I've used react router and NextJS. I'm hoping this project will give me the opportunity to explore some new technologies
-### Tanstack
-I haven't used these tools professionally, but I appreciate the way Tanstack approaches front-end code. Their tools feel more composable and lightweight as opposed to something like NextJS. 
-#### Tanstack/React Query
-I've used useSWR to handle more complex data fetching and caching in the, so I'm excited to try out another data-fetching library. I'm already noticing many similarities, but I do feel like the Tanstack Query API is more intuitive. 
-#### Tanstack Router
-I've used React Router and NextJS in the past, so Tanstack Router will be new for me. I think I'm already addicted to the concept of **type-safe routing**. 
+### Tanstack Router
+I've used React Router and NextJS in the past, so Tanstack Router will be new for me. I think I'm already addicted to the concept of **type-safe routing**.
+### LiveStore
+I'm migrating to LiveStore to explore local-first architecture and event sourcing. LiveStore provides offline-first reactive state management with SQLite, automatic sync across devices/tabs, and a CQRS event-sourced pattern. This eliminates much of the traditional backend API layer and moves state management to the edge.
 ### NestJS
 I've used several backend languages (Java, PHP, Python), and many different API frameworks. Currently I've been enjoying FastAPI. I would like to get more experience with the Node ecosystem, so I decided on NestJS. I was torn between NestJS and Hono since Hono is so lightweight. In the end, I went with NestJS since it seems to be a commonly used enterprise solution.
-### Drizzle ORM
-I've heard a lot of discussion around Prisma and Drizzle. Though Prisma seems to have a larger community, I'd like to try out Drizzle since I like the query syntax and the docs seem well-organized.
 ### SQLite
 I have always used Postgres in my professional career. I know it's a bit heavier but I feel like it's often talked about as one of the most scalable options. Even for hobby projects, I always used Postgres since I was already familiar with it. Now that I've used SQLite, I can see why people choose it. It seems to handle everything Postgres handles, and it's been extremely easy to interact with the database and back things up. Eventually, I may have use of Postgres's scalability, but for a small project, SQLite has been great.
 ## Tooling
 ### Frontend
 - React
-- Tanstack- Router, Query
+- Tanstack Router
+- LiveStore (local-first state management with SQLite)
+- Effect (functional programming library)
 - Tailwind v4
 - shadcn/ui
 - Vite
 ### Backend
-- NestJS (Fastify)
-- Drizzle ORM + SQLite
+- Cloudflare Workers (LiveStore sync server with Durable Objects)
+- Wrangler (Cloudflare dev tools)
+- D1 (Cloudflare's SQLite database)
+- NestJS (Fastify) - being phased out in favor of LiveStore
 ### Tooling
 - pnpm
 - Turborepo
@@ -56,12 +56,34 @@ pnpm install
 
 ## Environment
 
-apps/api/.env
+### Frontend (apps/web/.env)
+```bash
+# LiveStore Sync Configuration
+
+# Local development: Points to local Wrangler dev server
+VITE_LIVESTORE_SYNC_URL=http://localhost:8787
+
+# Production: Replace with deployed Cloudflare Worker URL
+# VITE_LIVESTORE_SYNC_URL=https://your-worker.your-subdomain.workers.dev
 ```
+
+**Local vs Production:**
+- **Local development**: Uses `http://localhost:8787` to sync with Wrangler dev server running locally
+  - Data persists in browser OPFS (Origin Private File System)
+  - Sync happens between browser tabs and to local D1 database
+  - Wrangler starts automatically when you run `pnpm dev` (see vite.config.ts)
+
+- **Production**: Update to your deployed Cloudflare Worker URL
+  - Deploy with `wrangler deploy` from apps/web directory
+  - Data syncs to production D1 database
+  - Real-time sync across devices and users
+
+### Backend (apps/api/.env) - Legacy, being phased out
+```bash
 DATABASE_SQLITE_PATH=./data/dev.db
 # add other env as needed later
 ```
-Create the data/ folder if it doesn’t exist:
+Create the data/ folder if it doesn't exist:
 `mkdir -p apps/api/data`
 
 ## Scripts
