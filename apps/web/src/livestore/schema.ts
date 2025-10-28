@@ -31,6 +31,7 @@ export const tables = {
       id: State.SQLite.text({ primaryKey: true }),
       title: State.SQLite.text(),
       author: State.SQLite.text({ nullable: true }),
+      currentPage: State.SQLite.integer({ nullable: true }), // reading progress
       createdAt: State.SQLite.integer(), // timestamp in milliseconds
       deletedAt: State.SQLite.integer({ nullable: true, schema: Schema.DateFromNumber }), // timestamp for soft delete
     },
@@ -45,6 +46,7 @@ export const tables = {
       title: State.SQLite.text(),
       content: State.SQLite.text({ nullable: true }),
       metadata: State.SQLite.text({ nullable: true, schema: Schema.parseJson(Schema.Unknown) }),
+      pageNumber: State.SQLite.integer(), // page where note was discovered
       createdAt: State.SQLite.integer(),
       updatedAt: State.SQLite.integer(),
       deletedAt: State.SQLite.integer({ nullable: true, schema: Schema.DateFromNumber }),
@@ -59,6 +61,7 @@ export const tables = {
       toNoteId: State.SQLite.text(),
       relationshipType: State.SQLite.text({ schema: RelationshipTypeSchema }),
       description: State.SQLite.text({ nullable: true }),
+      pageNumber: State.SQLite.integer(), // page where relationship was discovered
       createdAt: State.SQLite.integer(),
       deletedAt: State.SQLite.integer({ nullable: true, schema: Schema.DateFromNumber }),
     },
@@ -95,6 +98,14 @@ export const events = {
     }),
   }),
 
+  bookProgressUpdated: Events.synced({
+    name: 'v1.BookProgressUpdated',
+    schema: Schema.Struct({
+      id: Schema.String,
+      currentPage: Schema.Number,
+    }),
+  }),
+
   // Note events
   noteCreated: Events.synced({
     name: 'v1.NoteCreated',
@@ -105,6 +116,7 @@ export const events = {
       title: Schema.String,
       content: Schema.NullOr(Schema.String),
       metadata: Schema.optional(Schema.NullOr(Schema.Unknown)),
+      pageNumber: Schema.Number,
       createdAt: Schema.Number,
       updatedAt: Schema.Number,
     }),
@@ -139,6 +151,7 @@ export const events = {
       toNoteId: Schema.String,
       relationshipType: RelationshipTypeSchema,
       description: Schema.NullOr(Schema.String),
+      pageNumber: Schema.Number,
       createdAt: Schema.Number,
     }),
   }),
@@ -173,18 +186,22 @@ const materializers = State.SQLite.materializers(events, {
   'v1.BookDeleted': ({ id, deletedAt }: { id: string; deletedAt: Date }) =>
     tables.books.update({ deletedAt }).where({ id }),
 
+  'v1.BookProgressUpdated': ({ id, currentPage }: { id: string; currentPage: number }) =>
+    tables.books.update({ currentPage }).where({ id }),
+
   // Note materializers
-  'v1.NoteCreated': ({ id, bookId, type, title, content, metadata, createdAt, updatedAt }: {
+  'v1.NoteCreated': ({ id, bookId, type, title, content, metadata, pageNumber, createdAt, updatedAt }: {
     id: string
     bookId: string
     type: 'character' | 'organization' | 'event' | 'location' | 'item' | 'concept'
     title: string
     content: string | null
     metadata?: unknown | null
+    pageNumber: number
     createdAt: number
     updatedAt: number
   }) =>
-    tables.notes.insert({ id, bookId, type, title, content, metadata, createdAt, updatedAt }),
+    tables.notes.insert({ id, bookId, type, title, content, metadata, pageNumber, createdAt, updatedAt }),
 
   'v1.NoteUpdated': ({ id, type, title, content, metadata, updatedAt }: {
     id: string
@@ -200,15 +217,16 @@ const materializers = State.SQLite.materializers(events, {
     tables.notes.update({ deletedAt }).where({ id }),
 
   // Relationship materializers
-  'v1.RelationshipCreated': ({ id, fromNoteId, toNoteId, relationshipType, description, createdAt }: {
+  'v1.RelationshipCreated': ({ id, fromNoteId, toNoteId, relationshipType, description, pageNumber, createdAt }: {
     id: string
     fromNoteId: string
     toNoteId: string
     relationshipType: 'impacts' | 'member_of' | 'ally' | 'enemy' | 'family' | 'friend' | 'owns' | 'located_in' | 'causes'
     description: string | null
+    pageNumber: number
     createdAt: number
   }) =>
-    tables.noteRelationships.insert({ id, fromNoteId, toNoteId, relationshipType, description, createdAt }),
+    tables.noteRelationships.insert({ id, fromNoteId, toNoteId, relationshipType, description, pageNumber, createdAt }),
 
   'v1.RelationshipUpdated': ({ id, relationshipType, description }: {
     id: string

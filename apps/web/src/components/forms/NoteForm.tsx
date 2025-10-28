@@ -34,6 +34,7 @@ export function NoteForm({ bookId }: NoteFormProps) {
       type: '',
       title: '',
       content: '',
+      pageNumber: 1,
     },
   })
 
@@ -50,6 +51,7 @@ export function NoteForm({ bookId }: NoteFormProps) {
           title: data.title,
           content: data.content || null,
           metadata: null,
+          pageNumber: data.pageNumber,
           createdAt: now,
           updatedAt: now,
         })
@@ -114,6 +116,23 @@ export function NoteForm({ bookId }: NoteFormProps) {
         />
         {errors.content && (
           <p className="text-red-600 text-sm mt-1">{errors.content.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="pageNumber" className="block text-sm font-medium text-gray-700 mb-1">
+          Page Number *
+        </label>
+        <input
+          type="number"
+          id="pageNumber"
+          {...register('pageNumber', { valueAsNumber: true })}
+          min="1"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Page where this note appears"
+        />
+        {errors.pageNumber && (
+          <p className="text-red-600 text-sm mt-1">{errors.pageNumber.message}</p>
         )}
       </div>
 
