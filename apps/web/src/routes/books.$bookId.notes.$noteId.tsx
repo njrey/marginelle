@@ -3,6 +3,7 @@ import { useStore } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
 import { tables, type Note } from '@/livestore/schema'
 import { useBookProgress } from '@/contexts/BookProgressContext'
+import { Badge } from '@/components/ui/badge'
 
 export const Route = createFileRoute('/books/$bookId/notes/$noteId')({
   component: NoteDetailPage,
@@ -110,12 +111,8 @@ function NoteDetailPage() {
       {/* Note Details */}
       <div className="border border-gray-300 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-4">
-          <span className="inline-block px-3 py-1 text-sm font-semibold text-blue-800 bg-blue-100 rounded">
-            {note.type}
-          </span>
-          <span className="inline-block px-3 py-1 text-sm font-semibold text-green-700 bg-green-100 rounded">
-            Discovered: p.{note.pageNumber}
-          </span>
+          <Badge variant="secondary">{note.type}</Badge>
+          <Badge variant="outline">Discovered: p.{note.pageNumber}</Badge>
           <h2 className="text-2xl font-bold text-gray-900">{note.title}</h2>
         </div>
 
@@ -162,9 +159,7 @@ function NoteDetailPage() {
                     <div className="mt-3 space-y-1">
                       {relGroup.map((rel, relIdx) => (
                         <div key={rel.id} className="flex items-center gap-2 text-sm">
-                          <span className="inline-block px-2 py-0.5 text-xs font-semibold text-green-700 bg-green-100 rounded">
-                            p.{rel.pageNumber}
-                          </span>
+                          <Badge variant="outline" className="text-xs">p.{rel.pageNumber}</Badge>
                           <span className={`font-medium ${relIdx === relGroup.length - 1 ? 'text-blue-700' : 'text-gray-500'}`}>
                             {rel.relationshipType}
                           </span>
@@ -216,9 +211,7 @@ function NoteDetailPage() {
                     <div className="mt-3 space-y-1">
                       {relGroup.map((rel, relIdx) => (
                         <div key={rel.id} className="flex items-center gap-2 text-sm">
-                          <span className="inline-block px-2 py-0.5 text-xs font-semibold text-green-700 bg-green-100 rounded">
-                            p.{rel.pageNumber}
-                          </span>
+                          <Badge variant="outline" className="text-xs">p.{rel.pageNumber}</Badge>
                           <span className={`font-medium ${relIdx === relGroup.length - 1 ? 'text-blue-700' : 'text-gray-500'}`}>
                             {rel.relationshipType}
                           </span>

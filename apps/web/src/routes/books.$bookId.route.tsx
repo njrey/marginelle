@@ -3,6 +3,8 @@ import { useStore } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '@/livestore/schema'
 import { BookProgressProvider, useBookProgress } from '@/contexts/BookProgressContext'
+import { Slider } from '@/components/ui/slider'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/books/$bookId')({
@@ -23,7 +25,7 @@ function BookDetailContent() {
   const { bookId } = Route.useParams()
   const { store } = useStore()
   const { currentPage, setCurrentPage, maxPage } = useBookProgress()
-  const [inputPage, setInputPage] = useState(currentPage?.toString() || '1')
+  const [sliderValue, setSliderValue] = useState<number[]>([currentPage || 1])
 
   // Query for a single book by ID from local SQLite
   const book$ = queryDb(
@@ -38,11 +40,12 @@ function BookDetailContent() {
     return <div>Book not found or loading...</div>
   }
 
-  const handlePageUpdate = () => {
-    const page = parseInt(inputPage)
-    if (!isNaN(page) && page > 0) {
-      setCurrentPage(page)
-    }
+  const handleSliderChange = (value: number[]) => {
+    setSliderValue(value)
+  }
+
+  const handleSliderCommit = (value: number[]) => {
+    setCurrentPage(value[0])
   }
 
   return (
@@ -70,53 +73,50 @@ function BookDetailContent() {
       </div>
 
       {/* Reading Progress Control */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <label htmlFor="reading-progress" className="block text-sm font-medium text-gray-700 mb-2">
-              Reading Progress
-            </label>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                id="reading-progress"
-                value={inputPage}
-                onChange={(e) => setInputPage(e.target.value)}
-                onBlur={handlePageUpdate}
-                onKeyDown={(e) => e.key === 'Enter' && handlePageUpdate()}
-                min="1"
-                className="w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Page"
-              />
-              <button
-                onClick={handlePageUpdate}
-                className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Update
-              </button>
-              {maxPage && (
-                <button
-                  onClick={() => {
-                    setInputPage(maxPage.toString())
-                    setCurrentPage(maxPage)
-                  }}
-                  className="px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-                >
-                  Jump to Latest (p.{maxPage})
-                </button>
+      <Card className="mb-6 bg-blue-50 border-blue-200">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-base">Reading Progress</CardTitle>
+            <div className="text-sm text-muted-foreground">
+              {currentPage ? (
+                <span>Page <strong>{sliderValue[0]}</strong> {sliderValue[0] !== currentPage && '(drag to update)'}</span>
+              ) : (
+                <span>Set your reading progress</span>
               )}
             </div>
           </div>
-          <div className="text-sm text-gray-600">
-            {currentPage ? (
-              <span>Viewing as of page <strong>{currentPage}</strong></span>
-            ) : (
-              <span>Set your reading progress to filter notes</span>
-            )}
-            {maxPage && <div className="text-xs text-gray-500 mt-1">Latest content: page {maxPage}</div>}
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground w-8">1</span>
+            <Slider
+              value={sliderValue}
+              onValueChange={handleSliderChange}
+              onValueCommit={handleSliderCommit}
+              min={1}
+              max={maxPage || 100}
+              step={1}
+              className="flex-1"
+            />
+            <span className="text-sm text-muted-foreground w-12">{maxPage || '?'}</span>
           </div>
-        </div>
-      </div>
+
+          <div className="flex justify-between items-center text-xs text-muted-foreground">
+            <span>Start of book</span>
+            {maxPage && (
+              <button
+                onClick={() => {
+                  setSliderValue([maxPage])
+                  setCurrentPage(maxPage)
+                }}
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                Jump to Latest (p.{maxPage})
+              </button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       <Outlet />
     </div>

@@ -1,6 +1,7 @@
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useStore } from '@livestore/react'
 import { events } from '@/livestore/schema'
 import { useNavigate } from '@tanstack/react-router'
@@ -26,6 +27,7 @@ export function NoteForm({ bookId }: NoteFormProps) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<CreateNoteFormData>({
@@ -70,18 +72,24 @@ export function NoteForm({ bookId }: NoteFormProps) {
         <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
           Type *
         </label>
-        <select
-          id="type"
-          {...register('type')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="">Select a type...</option>
-          {NOTE_TYPES.map((type) => (
-            <option key={type.value} value={type.value}>
-              {type.label}
-            </option>
-          ))}
-        </select>
+        <Controller
+          name="type"
+          control={control}
+          render={({ field }) => (
+            <Select onValueChange={field.onChange} value={field.value}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a type..." />
+              </SelectTrigger>
+              <SelectContent>
+                {NOTE_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
         {errors.type && (
           <p className="text-red-600 text-sm mt-1">{errors.type.message}</p>
         )}
