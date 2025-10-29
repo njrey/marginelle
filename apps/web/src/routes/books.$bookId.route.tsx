@@ -45,7 +45,10 @@ function BookDetailContent() {
   }
 
   const handleSliderCommit = (value: number[]) => {
-    setCurrentPage(value[0])
+    // Round to nearest whole page when user releases the slider
+    const roundedPage = Math.round(value[0])
+    setSliderValue([roundedPage])
+    setCurrentPage(roundedPage)
   }
 
   return (
@@ -53,19 +56,19 @@ function BookDetailContent() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">{book.title}</h1>
-          {book.author && <p className="text-gray-600">by {book.author}</p>}
+          {book.author && <p className="text-muted-foreground">by {book.author}</p>}
         </div>
         <nav className="space-x-4">
           <Link
             to="/books/list"
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-primary hover:text-primary/80 underline"
           >
             Back to Books
           </Link>
           <Link
             to="/books/$bookId/notes"
             params={{ bookId: book.id }}
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-primary hover:text-primary/80 underline"
           >
             Notes
           </Link>
@@ -73,13 +76,13 @@ function BookDetailContent() {
       </div>
 
       {/* Reading Progress Control */}
-      <Card className="mb-6 bg-blue-50 border-blue-200">
+      <Card className="mb-6 bg-accent/10 border-accent/30">
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="text-base">Reading Progress</CardTitle>
             <div className="text-sm text-muted-foreground">
               {currentPage ? (
-                <span>Page <strong>{sliderValue[0]}</strong> {sliderValue[0] !== currentPage && '(drag to update)'}</span>
+                <span>Page <strong>{Math.round(sliderValue[0])}</strong> {Math.round(sliderValue[0]) !== currentPage && '(drag to update)'}</span>
               ) : (
                 <span>Set your reading progress</span>
               )}
@@ -95,7 +98,6 @@ function BookDetailContent() {
               onValueCommit={handleSliderCommit}
               min={1}
               max={maxPage || 100}
-              step={1}
               className="flex-1"
             />
             <span className="text-sm text-muted-foreground w-12">{maxPage || '?'}</span>
@@ -109,7 +111,7 @@ function BookDetailContent() {
                   setSliderValue([maxPage])
                   setCurrentPage(maxPage)
                 }}
-                className="text-blue-600 hover:text-blue-800 underline"
+                className="text-primary hover:text-primary/80 underline"
               >
                 Jump to Latest (p.{maxPage})
               </button>

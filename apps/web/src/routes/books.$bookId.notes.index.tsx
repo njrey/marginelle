@@ -66,7 +66,7 @@ function NotesListPage() {
           params={{ bookId, noteId: note.id }}
           className="block hover:shadow-lg transition-shadow"
         >
-          <Card className="hover:border-blue-400 transition-colors">
+          <Card className="hover:border-primary/60 transition-colors animate-in fade-in zoom-in-95 duration-500">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary">{note.type}</Badge>
