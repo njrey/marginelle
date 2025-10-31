@@ -1,6 +1,142 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 
+// Hand-drawn diagram component
+function HandDrawnDiagram({ variant }: { variant: number }) {
+  // Different diagram layouts for each page
+  const diagrams = [
+    // Diagram 1 - Simple hierarchy
+    <svg className="w-full h-32 sm:h-40" viewBox="15 1 300 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Connecting lines */}
+      <path d="M 150 25 Q 150 40, 100 55" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="2,2" />
+      <path d="M 150 25 Q 150 40, 200 55" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="2,2" />
+
+      {/* Box 1 - top */}
+      <rect x="120" y="5" width="60" height="20" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(-1 150 15)" />
+      <line x1="125" y1="11" x2="165" y2="11" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="125" y1="16" x2="155" y2="16" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      {/* Box 2 - left */}
+      <rect x="60" y="55" width="70" height="25" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(1 95 67)" />
+      <line x1="65" y1="63" x2="120" y2="63" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="65" y1="69" x2="110" y2="69" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="65" y1="75" x2="115" y2="75" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      {/* Box 3 - right */}
+      <rect x="170" y="55" width="70" height="25" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(-1.5 205 67)" />
+      <line x1="175" y1="63" x2="230" y2="63" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="175" y1="69" x2="220" y2="69" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+    </svg>,
+
+    // Diagram 2 - Web/network
+    <svg className="w-full h-32 sm:h-40" viewBox="5 10 300 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Connecting lines - web pattern */}
+      <path d="M 60 40 L 150 30" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="3,2" />
+      <path d="M 60 40 L 100 85" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="3,2" />
+      <path d="M 150 30 L 240 50" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="3,2" />
+      <path d="M 150 30 L 200 85" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="3,2" />
+      <path d="M 100 85 L 200 85" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="3,2" />
+
+      {/* Boxes */}
+      <rect x="30" y="25" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(2 60 40)" />
+      <line x1="35" y1="35" x2="80" y2="35" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="35" y1="42" x2="75" y2="42" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="120" y="15" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(-1 150 30)" />
+      <line x1="125" y1="25" x2="170" y2="25" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="125" y1="32" x2="165" y2="32" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="210" y="35" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(1.5 240 50)" />
+      <line x1="215" y1="45" x2="260" y2="45" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="70" y="70" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(-2 100 85)" />
+      <line x1="75" y1="80" x2="120" y2="80" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="75" y1="87" x2="110" y2="87" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="170" y="70" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(1 200 85)" />
+      <line x1="175" y1="80" x2="220" y2="80" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+    </svg>,
+
+    // Diagram 3 - Flow
+    <svg className="w-full h-32 sm:h-40" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Flow arrows */}
+      <path d="M 75 40 L 115 40" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
+      <path d="M 185 40 L 225 40" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
+      <path d="M 150 55 L 150 75" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
+
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <polygon points="0 0, 10 3, 0 6" fill="oklch(0.25 0.02 45)" />
+        </marker>
+      </defs>
+
+      {/* Boxes */}
+      <rect x="20" y="25" width="55" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(1 47 40)" />
+      <line x1="25" y1="35" x2="65" y2="35" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="120" y="25" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(-1 150 40)" />
+      <line x1="125" y1="35" x2="170" y2="35" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="125" y1="42" x2="165" y2="42" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="230" y="25" width="55" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(1.5 257 40)" />
+      <line x1="235" y1="35" x2="275" y2="35" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="120" y="80" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(-1 150 95)" />
+      <line x1="125" y1="90" x2="170" y2="90" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="125" y1="97" x2="160" y2="97" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+    </svg>,
+
+    // Diagram 4 - Mind map
+    <svg className="w-full h-32 sm:h-40" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Curved connecting lines */}
+      <path d="M 150 50 Q 120 35, 90 35" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="2,2" />
+      <path d="M 150 50 Q 180 35, 210 35" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="2,2" />
+      <path d="M 150 50 Q 120 75, 90 90" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="2,2" />
+      <path d="M 150 50 Q 180 75, 210 90" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" strokeDasharray="2,2" />
+
+      {/* Center circle */}
+      <circle cx="150" cy="50" r="25" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5" transform="rotate(2 150 50)" />
+      <line x1="135" y1="45" x2="165" y2="45" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+      <line x1="135" y1="52" x2="160" y2="52" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      {/* Outer boxes */}
+      <rect x="60" y="20" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(-2 90 35)" />
+      <line x1="65" y1="30" x2="110" y2="30" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="180" y="20" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(1.5 210 35)" />
+      <line x1="185" y1="30" x2="230" y2="30" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="60" y="75" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(1 90 90)" />
+      <line x1="65" y1="85" x2="110" y2="85" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+
+      <rect x="180" y="75" width="60" height="30" fill="none" stroke="oklch(0.25 0.02 45)" strokeWidth="1.5"
+        rx="2" transform="rotate(-1.5 210 90)" />
+      <line x1="185" y1="85" x2="230" y2="85" stroke="oklch(0.25 0.02 45)" strokeWidth="0.8" opacity="0.6" />
+    </svg>,
+  ]
+
+  return (
+    <div className="mt-6 sm:mt-8 opacity-80">
+      {diagrams[variant]}
+    </div>
+  )
+}
+
 // BookPage component for interior pages
 interface BookPageProps {
   title: string
@@ -8,18 +144,19 @@ interface BookPageProps {
   marginNote: string
   highlightColor: string
   isLast?: boolean
+  pageIndex?: number
 }
 
-function BookPage({ title, content, marginNote, highlightColor, isLast }: BookPageProps) {
+function BookPage({ title, content, marginNote, highlightColor, isLast, pageIndex }: BookPageProps) {
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
       {/* Front side of page */}
       <div
-        className="absolute inset-0 p-6 sm:p-8 md:p-10 lg:p-12 overflow-hidden"
+        className="absolute inset-0 p-6 sm:p-8 md:p-10 lg:p-12 overflow-hidden bg-card flex flex-col"
         style={{ backfaceVisibility: 'hidden' }}
       >
         {/* Book text content */}
-        <div className="text-foreground space-y-4 sm:space-y-6">
+        <div className="text-foreground space-y-4 sm:space-y-6 flex-shrink-0">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-6">
             {title}
           </h2>
@@ -57,9 +194,14 @@ function BookPage({ title, content, marginNote, highlightColor, isLast }: BookPa
           )}
         </div>
 
+        {/* Hand-drawn diagram at bottom */}
+        <div className="flex-grow flex items-end">
+          <HandDrawnDiagram variant={pageIndex || 0} />
+        </div>
+
         {/* Handwritten margin note */}
         <div
-          className="absolute right-2 top-1/3 max-w-[120px] sm:max-w-[160px] md:max-w-[200px]"
+          className="absolute right-3 top-1/4 max-w-[120px] sm:max-w-[160px] md:max-w-[200px]"
           style={{
             transform: 'rotate(-2deg)',
             fontFamily: 'Caveat, cursive',
@@ -81,9 +223,9 @@ function BookPage({ title, content, marginNote, highlightColor, isLast }: BookPa
         </div>
       </div>
 
-      {/* Back side of page (reversed) */}
+      {/* Back side of page (opaque, prevents text show-through) */}
       <div
-        className="absolute inset-0 bg-card"
+        className="absolute inset-0 bg-card border-2 border-border"
         style={{
           transform: 'rotateY(180deg)',
           backfaceVisibility: 'hidden',
@@ -326,6 +468,7 @@ export function BookAnimation() {
                   content={pages[0].content}
                   marginNote={pages[0].marginNote}
                   highlightColor={pages[0].color}
+                  pageIndex={0}
                 />
               </motion.div>
 
@@ -344,6 +487,7 @@ export function BookAnimation() {
                   content={pages[1].content}
                   marginNote={pages[1].marginNote}
                   highlightColor={pages[1].color}
+                  pageIndex={1}
                 />
               </motion.div>
 
@@ -362,6 +506,7 @@ export function BookAnimation() {
                   content={pages[2].content}
                   marginNote={pages[2].marginNote}
                   highlightColor={pages[2].color}
+                  pageIndex={2}
                 />
               </motion.div>
 
@@ -380,6 +525,7 @@ export function BookAnimation() {
                   content={pages[3].content}
                   marginNote={pages[3].marginNote}
                   highlightColor={pages[3].color}
+                  pageIndex={3}
                   isLast={true}
                 />
               </motion.div>

@@ -1,4 +1,8 @@
 ## Look and feel
+- make the diagrams larger
+- make diagrams and highlights timed or scroll-based
+  - https://ui.aceternity.com/components/hero-highlight
+  - https://ui.aceternity.com/components/google-gemini-effect
 - Replace Links with Buttons
 - Add breadcrumbs
 - consider adding a nav menu or sidebar
