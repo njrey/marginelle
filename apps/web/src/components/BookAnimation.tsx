@@ -143,11 +143,10 @@ interface BookPageProps {
   content: string
   marginNote: string
   highlightColor: string
-  isLast?: boolean
   pageIndex?: number
 }
 
-function BookPage({ title, content, marginNote, highlightColor, isLast, pageIndex }: BookPageProps) {
+function BookPage({ title, content, marginNote, highlightColor, pageIndex }: BookPageProps) {
   return (
     <div className="relative w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
       {/* Front side of page */}
@@ -181,17 +180,6 @@ function BookPage({ title, content, marginNote, highlightColor, isLast, pageInde
             dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </p>
-
-          {isLast && (
-            <div className="pt-8">
-              <a
-                href="/books/list"
-                className="inline-flex items-center justify-center px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity shadow-md text-sm sm:text-base"
-              >
-                Get Started
-              </a>
-            </div>
-          )}
         </div>
 
         {/* Hand-drawn diagram at bottom */}
@@ -265,6 +253,13 @@ const pages = [
     content: 'Track your reading journey',
     marginNote: 'See how far you\'ve come',
   },
+  {
+    id: 'get-started',
+    title: 'Begin',
+    color: '#DDD6FE', // purple
+    content: '',
+    marginNote: '',
+  },
 ]
 
 export function BookAnimation() {
@@ -325,7 +320,7 @@ export function BookAnimation() {
         >
           {/* Post-it note navigation - attached to top edge of book */}
           <motion.div
-            className="absolute -top-10 left-1/4 right-1/4 flex flex-row justify-around gap-1 sm:gap-2"
+            className="absolute -top-10 left-10 right-1/4 flex flex-row justify-around gap-1 sm:gap-2"
             style={{
               //y: postItTranslateY,
             }}
@@ -399,7 +394,7 @@ export function BookAnimation() {
                 className="absolute inset-0 rounded-l-lg border-2 border-primary"
                 style={{
                   background: 'linear-gradient(to right, oklch(0.40 0.08 45), oklch(0.45 0.08 45))',
-                  transform: 'translateZ(4px)',
+                  transform: 'translateZ(2px)',
                   transformOrigin: 'right center',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                 }}
@@ -526,9 +521,33 @@ export function BookAnimation() {
                   marginNote={pages[3].marginNote}
                   highlightColor={pages[3].color}
                   pageIndex={3}
-                  isLast={true}
                 />
               </motion.div>
+
+              {/* Final Page - Get Started (static, no flip) */}
+              <div
+                className="absolute inset-0 bg-card border-2 border-border"
+                style={{
+                  transformStyle: 'preserve-3d',
+                  transform: 'translateZ(3px)', // Behind all flipping pages but visible when they all flip away
+                }}
+              >
+                <div className="absolute inset-0 p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col items-center justify-center bg-card" style={{ zIndex: 10, position: 'relative' }}>
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-6 text-center text-foreground">
+                    Get Started
+                  </h2>
+                  <p className="text-base sm:text-lg md:text-xl text-center text-muted-foreground mb-8 max-w-md">
+                    Start your journey by clicking below
+                  </p>
+                  <a
+                    href="/books/list"
+                    className="inline-flex items-center justify-center px-8 sm:px-10 py-3 sm:py-4 rounded-lg bg-primary text-primary-foreground font-medium text-base sm:text-lg hover:opacity-90 transition-opacity shadow-lg relative z-20"
+                    style={{ pointerEvents: 'auto' }}
+                  >
+                    Get Started
+                  </a>
+                </div>
+              </div>
 
               {/* Book spine - left side */}
               <motion.div
