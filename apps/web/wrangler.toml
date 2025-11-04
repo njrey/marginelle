@@ -5,7 +5,7 @@ compatibility_date = "2025-05-08"
 
 # TODO: Add your Cloudflare account ID here
 # Find it in Cloudflare Dashboard > Overview (right sidebar)
-# account_id = "your-account-id-here"
+account_id = "3f7282dd7e726f4414b70698b0b4fd5b"
 
 [[durable_objects.bindings]]
 name = "WEBSOCKET_SERVER"
