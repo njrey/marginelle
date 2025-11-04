@@ -13,10 +13,10 @@ class_name = "WebSocketServer"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["WebSocketServer"]
+new_sqlite_classes = ["WebSocketServer"]
 
 [[d1_databases]]
-binding = "marginelle_sync"
+binding = "DB"
 database_name = "marginelle-sync"
 database_id = "16c74e8c-230d-474e-96f6-20b7c04962f5"
 
