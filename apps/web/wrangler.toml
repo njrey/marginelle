@@ -16,9 +16,14 @@ tag = "v1"
 new_classes = ["WebSocketServer"]
 
 [[d1_databases]]
-binding = "DB"
-database_name = "livestore-sync-cf-demo"
-database_id = "1c9b5dae-f1fa-49d8-83fa-7bd5b39c4121"
+binding = "marginelle_sync"
+database_name = "marginelle-sync"
+database_id = "16c74e8c-230d-474e-96f6-20b7c04962f5"
+
+#[[d1_databases]]
+#binding = "DB"
+#database_name = "livestore-sync-cf-demo"
+#database_id = "1c9b5dae-f1fa-49d8-83fa-7bd5b39c4121"
 # database_id = "${LIVESTORE_CF_SYNC_DATABASE_ID}"
 
 [vars]
