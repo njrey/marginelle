@@ -3,6 +3,10 @@ main = "./src/cf-worker/index.ts"
 compatibility_date = "2025-05-08"
 # compatibility_flags = ["nodejs_compat"]
 
+# TODO: Add your Cloudflare account ID here
+# Find it in Cloudflare Dashboard > Overview (right sidebar)
+# account_id = "your-account-id-here"
+
 [[durable_objects.bindings]]
 name = "WEBSOCKET_SERVER"
 class_name = "WebSocketServer"

@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "description": "SPA routing configuration - all routes fall back to index.html",
+  "include": ["/*"],
+  "exclude": [
+    "/assets/*",
+    "/*.js",
+    "/*.css",
+    "/*.wasm",
+    "/*.json",
+    "/*.ico",
+    "/*.png",
+    "/*.svg",
+    "/*.jpg",
+    "/*.jpeg",
+    "/*.gif",
+    "/*.webp",
+    "/*.woff",
+    "/*.woff2",
+    "/*.ttf"
+  ]
+}
