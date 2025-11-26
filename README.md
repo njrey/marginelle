@@ -6,8 +6,6 @@ This app is mostly a place to learn some technologies that I'm not as familiar w
 I've used React Router and NextJS in the past, so Tanstack Router will be new for me. I think I'm already addicted to the concept of **type-safe routing**.
 ### LiveStore
 I'm migrating to LiveStore to explore local-first architecture and event sourcing. LiveStore provides offline-first reactive state management with SQLite, automatic sync across devices/tabs, and a CQRS event-sourced pattern. This eliminates much of the traditional backend API layer and moves state management to the edge.
-### NestJS
-I've used several backend languages (Java, PHP, Python), and many different API frameworks. Currently I've been enjoying FastAPI. I would like to get more experience with the Node ecosystem, so I decided on NestJS. I was torn between NestJS and Hono since Hono is so lightweight. In the end, I went with NestJS since it seems to be a commonly used enterprise solution.
 ### SQLite
 I have always used Postgres in my professional career. I know it's a bit heavier but I feel like it's often talked about as one of the most scalable options. Even for hobby projects, I always used Postgres since I was already familiar with it. Now that I've used SQLite, I can see why people choose it. It seems to handle everything Postgres handles, and it's been extremely easy to interact with the database and back things up. Eventually, I may have use of Postgres's scalability, but for a small project, SQLite has been great.
 ## Tooling
@@ -32,9 +30,6 @@ I have always used Postgres in my professional career. I know it's a bit heavier
 ```
 marginelle/
 |- apps/
-|   |- api/
-|   |   |- api/
-|   |   |- data/
 |   |- web/
 |   |   |- src/
 |   |   |   |- routes/
