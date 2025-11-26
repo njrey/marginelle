@@ -41,6 +41,7 @@
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "@livestore/devtools-vite": "^0.3.1",
+    "@effect/opentelemetry": "^0.59.1",
     "@tailwindcss/vite": "^4.1.13",
     "@tanstack/router-plugin": "^1.132.7",
     "@types/d3-drag": "^3.0.7",
