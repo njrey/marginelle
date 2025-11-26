@@ -43,6 +43,14 @@ function NotesLayout() {
               Create Relationship
             </Link>
           </Button>
+          <Button asChild variant="outline">
+            <Link
+              to="/books/$bookId/notes/graph"
+              params={{ bookId: book.id }}
+            >
+              Graph View
+            </Link>
+          </Button>
         </div>
       </div>
       <Outlet />
