@@ -1,7 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useStore } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '@/livestore/schema'
+import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/books/$bookId/')({
   component: BookDetailIndexPage,
@@ -27,7 +28,13 @@ function BookDetailIndexPage() {
     <div>
       <p className="text-gray-600">You are viewing details for "{book.title}"</p>
       {book.author && <p className="text-gray-600">Written by {book.author}</p>}
-      <p className="text-gray-600 mt-4">Click "Notes" in the navigation to view notes for this book.</p>
+      <div className="mt-4">
+        <Button asChild>
+          <Link to="/books/$bookId/notes" params={{ bookId }}>
+            View Notes
+          </Link>
+        </Button>
+      </div>
     </div>
   )
 }

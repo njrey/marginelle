@@ -1,4 +1,4 @@
-import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useStore } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
 import { tables } from '@/livestore/schema'
@@ -53,26 +53,9 @@ function BookDetailContent() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">{book.title}</h1>
-          {book.author && <p className="text-muted-foreground">by {book.author}</p>}
-        </div>
-        <nav className="space-x-4">
-          <Link
-            to="/books/list"
-            className="text-primary hover:text-primary/80 underline"
-          >
-            Back to Books
-          </Link>
-          <Link
-            to="/books/$bookId/notes"
-            params={{ bookId: book.id }}
-            className="text-primary hover:text-primary/80 underline"
-          >
-            Notes
-          </Link>
-        </nav>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">{book.title}</h1>
+        {book.author && <p className="text-muted-foreground">by {book.author}</p>}
       </div>
 
       {/* Reading Progress Control */}
