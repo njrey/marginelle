@@ -28,10 +28,15 @@ function BookDetailIndexPage() {
     <div>
       <p className="text-gray-600">You are viewing details for "{book.title}"</p>
       {book.author && <p className="text-gray-600">Written by {book.author}</p>}
-      <div className="mt-4">
+      <div className="mt-4 flex gap-2">
         <Button asChild>
           <Link to="/books/$bookId/notes" params={{ bookId }}>
             View Notes
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/books/$bookId/graph" params={{ bookId }}>
+            Character Graph
           </Link>
         </Button>
       </div>

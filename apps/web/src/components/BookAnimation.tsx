@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 
 // Hand-drawn diagram component
@@ -264,6 +264,18 @@ const pages = [
 
 export function BookAnimation() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768) // md breakpoint
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Track scroll progress within the container
   const { scrollYProgress } = useScroll({
@@ -280,8 +292,12 @@ export function BookAnimation() {
   const page3Rotation = useTransform(scrollYProgress, [0.6, 0.8], [0, -175])
   const page4Rotation = useTransform(scrollYProgress, [0.8, 1], [0, -175])
 
-  // Slide book to right as it opens to keep it centered
-  const bookTranslateX = useTransform(scrollYProgress, [0, 0.2], ['0%', '25%'])
+  // Slide book to right as it opens to keep it centered - less on mobile
+  const bookTranslateX = useTransform(
+    scrollYProgress,
+    [0, 0.2],
+    isMobile ? ['0%', '10%'] : ['0%', '25%']
+  )
 
   // Post-it visibility - peek out when closed (partially hidden), fully visible when open
   //const postItTranslateY = useTransform(scrollYProgress, [.5, 0.2], [-20, 10])
@@ -320,7 +336,7 @@ export function BookAnimation() {
         >
           {/* Post-it note navigation - attached to top edge of book */}
           <motion.div
-            className="absolute -top-10 left-10 right-1/4 flex flex-row justify-around gap-1 sm:gap-2"
+            className="absolute -top-10 left-0 right-0 md:left-10 md:right-1/4 flex flex-row justify-around gap-1 sm:gap-2 px-2 md:px-0"
             style={{
               //y: postItTranslateY,
             }}
@@ -551,7 +567,7 @@ export function BookAnimation() {
 
               {/* Book spine - left side */}
               <motion.div
-                className="absolute top-2 bottom-5.5 -left-6 w-16 sm:w-20 md:w-24 lg:w-28 border-y-2 border-primary rounded-l-lg"
+                className="absolute top-2 bottom-5.5 -left-3 w-10 sm:-left-4 sm:w-14 md:-left-6 md:w-24 lg:w-28 border-y-2 border-primary rounded-l-lg"
                 style={{
                   transform: 'rotateY(-70deg) skewY(5deg)',
                   transformOrigin: 'left center',

@@ -3,6 +3,7 @@ import * as d3Force from 'd3-force'
 import * as d3Selection from 'd3-selection'
 import * as d3Drag from 'd3-drag'
 import * as d3Zoom from 'd3-zoom'
+import * as d3Polygon from 'd3-polygon'
 import 'd3-transition'
 import { Card } from '@/components/ui/card'
 
@@ -18,6 +19,14 @@ interface GraphEdge {
   pageNumber: number
 }
 
+interface OrganizationGroup {
+  id: string
+  name: string
+  memberIds: string[]
+  pageNumber: number
+  color: string
+}
+
 // D3 augmented node type (adds x, y, vx, vy, fx, fy)
 interface ForceNode extends GraphNode {
   x?: number
@@ -31,10 +40,11 @@ interface ForceNode extends GraphNode {
 interface CharacterGraphProps {
   nodes: GraphNode[]
   edges: GraphEdge[]
+  organizations?: OrganizationGroup[]
   onNodeClick?: (nodeId: string) => void
 }
 
-export function CharacterGraph({ nodes, edges, onNodeClick }: CharacterGraphProps) {
+export function CharacterGraph({ nodes, edges, organizations = [], onNodeClick }: CharacterGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const simulationRef = useRef<d3Force.Simulation<ForceNode, undefined> | null>(null)
 
@@ -49,6 +59,11 @@ export function CharacterGraph({ nodes, edges, onNodeClick }: CharacterGraphProp
 
     const svg = d3Selection.select(svgRef.current)
     const g = svg.append('g')
+
+    // Create layers for proper z-ordering (hulls behind everything)
+    const hullLayer = g.append('g').attr('class', 'hulls')
+    const linkLayer = g.append('g').attr('class', 'links')
+    const nodeLayer = g.append('g').attr('class', 'nodes')
 
     // Create copies to avoid mutating props
     const nodesCopy: ForceNode[] = nodes.map(d => ({ ...d }))
@@ -68,7 +83,7 @@ export function CharacterGraph({ nodes, edges, onNodeClick }: CharacterGraphProp
     simulationRef.current = simulation
 
     // Create links
-    const link = g.append('g')
+    const link = linkLayer
       .selectAll('line')
       .data(edgesCopy)
       .join('line')
@@ -77,7 +92,7 @@ export function CharacterGraph({ nodes, edges, onNodeClick }: CharacterGraphProp
       .attr('stroke-opacity', 0.6)
 
     // Create nodes
-    const node = g.append('g')
+    const node = nodeLayer
       .selectAll('g')
       .data(nodesCopy)
       .join('g')
@@ -151,6 +166,68 @@ export function CharacterGraph({ nodes, edges, onNodeClick }: CharacterGraphProp
 
     svg.call(zoom as any)
 
+    // Helper function to draw convex hulls around organization members
+    const drawHulls = () => {
+      // Remove old hulls
+      hullLayer.selectAll('path').remove()
+      hullLayer.selectAll('text').remove()
+
+      organizations.forEach(org => {
+        // Get the positions of all member nodes
+        const memberNodes = nodesCopy.filter(n => org.memberIds.includes(n.id))
+        if (memberNodes.length < 2) return // Need at least 2 nodes for a hull
+
+        // Get node positions with padding
+        const points = memberNodes
+          .filter(n => n.x !== undefined && n.y !== undefined)
+          .map(n => [n.x!, n.y!] as [number, number])
+
+        if (points.length < 2) return
+
+        // Calculate convex hull
+        const hull = d3Polygon.polygonHull(points)
+        if (!hull) return
+
+        // Expand hull outward for padding
+        const centroid = d3Polygon.polygonCentroid(hull)
+        const paddedHull = hull.map(point => {
+          const dx = point[0] - centroid[0]
+          const dy = point[1] - centroid[1]
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          const padding = 50 // pixels of padding
+          return [
+            point[0] + (dx / distance) * padding,
+            point[1] + (dy / distance) * padding
+          ]
+        })
+
+        // Draw the hull
+        hullLayer.append('path')
+          .datum(paddedHull)
+          .attr('d', (d) => {
+            return 'M' + d.join('L') + 'Z'
+          })
+          .attr('fill', org.color)
+          .attr('fill-opacity', 0.15)
+          .attr('stroke', org.color)
+          .attr('stroke-width', 2)
+          .attr('stroke-opacity', 0.5)
+          .attr('stroke-dasharray', '5,5')
+          .attr('rx', 20) // Rounded corners
+
+        // Add organization label
+        hullLayer.append('text')
+          .attr('x', centroid[0])
+          .attr('y', centroid[1] - d3Polygon.polygonLength(hull) / 4)
+          .attr('text-anchor', 'middle')
+          .attr('fill', org.color)
+          .attr('font-size', '14px')
+          .attr('font-weight', 'bold')
+          .attr('opacity', 0.7)
+          .text(org.name)
+      })
+    }
+
     // Update positions on tick
     simulation.on('tick', () => {
       link
@@ -160,12 +237,15 @@ export function CharacterGraph({ nodes, edges, onNodeClick }: CharacterGraphProp
         .attr('y2', (d: any) => d.target.y)
 
       node.attr('transform', (d: any) => `translate(${d.x},${d.y})`)
+
+      // Redraw hulls on every tick to follow nodes
+      drawHulls()
     })
 
     return () => {
       simulation.stop()
     }
-  }, [nodes, edges, onNodeClick])
+  }, [nodes, edges, organizations, onNodeClick])
 
   return (
     <Card className="p-4">

@@ -15,10 +15,10 @@ import { Route as BooksNewRouteImport } from './routes/books.new'
 import { Route as BooksListRouteImport } from './routes/books.list'
 import { Route as BooksBookIdRouteRouteImport } from './routes/books.$bookId.route'
 import { Route as BooksBookIdIndexRouteImport } from './routes/books.$bookId.index'
+import { Route as BooksBookIdGraphRouteImport } from './routes/books.$bookId.graph'
 import { Route as BooksBookIdNotesRouteRouteImport } from './routes/books.$bookId.notes.route'
 import { Route as BooksBookIdNotesIndexRouteImport } from './routes/books.$bookId.notes.index'
 import { Route as BooksBookIdNotesNewRouteImport } from './routes/books.$bookId.notes.new'
-import { Route as BooksBookIdNotesGraphRouteImport } from './routes/books.$bookId.notes.graph'
 import { Route as BooksBookIdNotesNoteIdRouteImport } from './routes/books.$bookId.notes.$noteId'
 import { Route as BooksBookIdNotesRelationshipsNewRouteImport } from './routes/books.$bookId.notes.relationships.new'
 
@@ -52,6 +52,11 @@ const BooksBookIdIndexRoute = BooksBookIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => BooksBookIdRouteRoute,
 } as any)
+const BooksBookIdGraphRoute = BooksBookIdGraphRouteImport.update({
+  id: '/graph',
+  path: '/graph',
+  getParentRoute: () => BooksBookIdRouteRoute,
+} as any)
 const BooksBookIdNotesRouteRoute = BooksBookIdNotesRouteRouteImport.update({
   id: '/notes',
   path: '/notes',
@@ -65,11 +70,6 @@ const BooksBookIdNotesIndexRoute = BooksBookIdNotesIndexRouteImport.update({
 const BooksBookIdNotesNewRoute = BooksBookIdNotesNewRouteImport.update({
   id: '/new',
   path: '/new',
-  getParentRoute: () => BooksBookIdNotesRouteRoute,
-} as any)
-const BooksBookIdNotesGraphRoute = BooksBookIdNotesGraphRouteImport.update({
-  id: '/graph',
-  path: '/graph',
   getParentRoute: () => BooksBookIdNotesRouteRoute,
 } as any)
 const BooksBookIdNotesNoteIdRoute = BooksBookIdNotesNoteIdRouteImport.update({
@@ -91,9 +91,9 @@ export interface FileRoutesByFullPath {
   '/books/list': typeof BooksListRoute
   '/books/new': typeof BooksNewRoute
   '/books/$bookId/notes': typeof BooksBookIdNotesRouteRouteWithChildren
+  '/books/$bookId/graph': typeof BooksBookIdGraphRoute
   '/books/$bookId/': typeof BooksBookIdIndexRoute
   '/books/$bookId/notes/$noteId': typeof BooksBookIdNotesNoteIdRoute
-  '/books/$bookId/notes/graph': typeof BooksBookIdNotesGraphRoute
   '/books/$bookId/notes/new': typeof BooksBookIdNotesNewRoute
   '/books/$bookId/notes/': typeof BooksBookIdNotesIndexRoute
   '/books/$bookId/notes/relationships/new': typeof BooksBookIdNotesRelationshipsNewRoute
@@ -103,9 +103,9 @@ export interface FileRoutesByTo {
   '/books': typeof BooksRouteRouteWithChildren
   '/books/list': typeof BooksListRoute
   '/books/new': typeof BooksNewRoute
+  '/books/$bookId/graph': typeof BooksBookIdGraphRoute
   '/books/$bookId': typeof BooksBookIdIndexRoute
   '/books/$bookId/notes/$noteId': typeof BooksBookIdNotesNoteIdRoute
-  '/books/$bookId/notes/graph': typeof BooksBookIdNotesGraphRoute
   '/books/$bookId/notes/new': typeof BooksBookIdNotesNewRoute
   '/books/$bookId/notes': typeof BooksBookIdNotesIndexRoute
   '/books/$bookId/notes/relationships/new': typeof BooksBookIdNotesRelationshipsNewRoute
@@ -118,9 +118,9 @@ export interface FileRoutesById {
   '/books/list': typeof BooksListRoute
   '/books/new': typeof BooksNewRoute
   '/books/$bookId/notes': typeof BooksBookIdNotesRouteRouteWithChildren
+  '/books/$bookId/graph': typeof BooksBookIdGraphRoute
   '/books/$bookId/': typeof BooksBookIdIndexRoute
   '/books/$bookId/notes/$noteId': typeof BooksBookIdNotesNoteIdRoute
-  '/books/$bookId/notes/graph': typeof BooksBookIdNotesGraphRoute
   '/books/$bookId/notes/new': typeof BooksBookIdNotesNewRoute
   '/books/$bookId/notes/': typeof BooksBookIdNotesIndexRoute
   '/books/$bookId/notes/relationships/new': typeof BooksBookIdNotesRelationshipsNewRoute
@@ -134,9 +134,9 @@ export interface FileRouteTypes {
     | '/books/list'
     | '/books/new'
     | '/books/$bookId/notes'
+    | '/books/$bookId/graph'
     | '/books/$bookId/'
     | '/books/$bookId/notes/$noteId'
-    | '/books/$bookId/notes/graph'
     | '/books/$bookId/notes/new'
     | '/books/$bookId/notes/'
     | '/books/$bookId/notes/relationships/new'
@@ -146,9 +146,9 @@ export interface FileRouteTypes {
     | '/books'
     | '/books/list'
     | '/books/new'
+    | '/books/$bookId/graph'
     | '/books/$bookId'
     | '/books/$bookId/notes/$noteId'
-    | '/books/$bookId/notes/graph'
     | '/books/$bookId/notes/new'
     | '/books/$bookId/notes'
     | '/books/$bookId/notes/relationships/new'
@@ -160,9 +160,9 @@ export interface FileRouteTypes {
     | '/books/list'
     | '/books/new'
     | '/books/$bookId/notes'
+    | '/books/$bookId/graph'
     | '/books/$bookId/'
     | '/books/$bookId/notes/$noteId'
-    | '/books/$bookId/notes/graph'
     | '/books/$bookId/notes/new'
     | '/books/$bookId/notes/'
     | '/books/$bookId/notes/relationships/new'
@@ -217,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BooksBookIdIndexRouteImport
       parentRoute: typeof BooksBookIdRouteRoute
     }
+    '/books/$bookId/graph': {
+      id: '/books/$bookId/graph'
+      path: '/graph'
+      fullPath: '/books/$bookId/graph'
+      preLoaderRoute: typeof BooksBookIdGraphRouteImport
+      parentRoute: typeof BooksBookIdRouteRoute
+    }
     '/books/$bookId/notes': {
       id: '/books/$bookId/notes'
       path: '/notes'
@@ -238,13 +245,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BooksBookIdNotesNewRouteImport
       parentRoute: typeof BooksBookIdNotesRouteRoute
     }
-    '/books/$bookId/notes/graph': {
-      id: '/books/$bookId/notes/graph'
-      path: '/graph'
-      fullPath: '/books/$bookId/notes/graph'
-      preLoaderRoute: typeof BooksBookIdNotesGraphRouteImport
-      parentRoute: typeof BooksBookIdNotesRouteRoute
-    }
     '/books/$bookId/notes/$noteId': {
       id: '/books/$bookId/notes/$noteId'
       path: '/$noteId'
@@ -264,7 +264,6 @@ declare module '@tanstack/react-router' {
 
 interface BooksBookIdNotesRouteRouteChildren {
   BooksBookIdNotesNoteIdRoute: typeof BooksBookIdNotesNoteIdRoute
-  BooksBookIdNotesGraphRoute: typeof BooksBookIdNotesGraphRoute
   BooksBookIdNotesNewRoute: typeof BooksBookIdNotesNewRoute
   BooksBookIdNotesIndexRoute: typeof BooksBookIdNotesIndexRoute
   BooksBookIdNotesRelationshipsNewRoute: typeof BooksBookIdNotesRelationshipsNewRoute
@@ -272,7 +271,6 @@ interface BooksBookIdNotesRouteRouteChildren {
 
 const BooksBookIdNotesRouteRouteChildren: BooksBookIdNotesRouteRouteChildren = {
   BooksBookIdNotesNoteIdRoute: BooksBookIdNotesNoteIdRoute,
-  BooksBookIdNotesGraphRoute: BooksBookIdNotesGraphRoute,
   BooksBookIdNotesNewRoute: BooksBookIdNotesNewRoute,
   BooksBookIdNotesIndexRoute: BooksBookIdNotesIndexRoute,
   BooksBookIdNotesRelationshipsNewRoute: BooksBookIdNotesRelationshipsNewRoute,
@@ -285,11 +283,13 @@ const BooksBookIdNotesRouteRouteWithChildren =
 
 interface BooksBookIdRouteRouteChildren {
   BooksBookIdNotesRouteRoute: typeof BooksBookIdNotesRouteRouteWithChildren
+  BooksBookIdGraphRoute: typeof BooksBookIdGraphRoute
   BooksBookIdIndexRoute: typeof BooksBookIdIndexRoute
 }
 
 const BooksBookIdRouteRouteChildren: BooksBookIdRouteRouteChildren = {
   BooksBookIdNotesRouteRoute: BooksBookIdNotesRouteRouteWithChildren,
+  BooksBookIdGraphRoute: BooksBookIdGraphRoute,
   BooksBookIdIndexRoute: BooksBookIdIndexRoute,
 }
 
