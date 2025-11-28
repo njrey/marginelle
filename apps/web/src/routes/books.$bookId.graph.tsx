@@ -57,6 +57,11 @@ function GraphViewPage() {
     .filter(r => r.relationshipType === 'member_of')
     .filter(r => currentPage ? r.pageNumber <= currentPage : true)
 
+  // 4b. Filter for org-to-org relationships (ally/enemy) + temporal filter
+  const orgToOrgRelationships = (allRelationships || [])
+    .filter(r => r.relationshipType === 'ally' || r.relationshipType === 'enemy')
+    .filter(r => currentPage ? r.pageNumber <= currentPage : true)
+
   // 5. Filter edges where BOTH nodes are visible
   const visibleCharacterIds = new Set(visibleCharacters.map(c => c.id))
   const visibleEdges = friendRelationships.filter(edge =>
@@ -64,7 +69,7 @@ function GraphViewPage() {
   )
 
   // 6. Build organization groups with member lists
-  //const visibleOrgIds = new Set(visibleOrganizations.map(o => o.id))
+  const visibleOrgIds = new Set(visibleOrganizations.map(o => o.id))
   const organizationGroups = visibleOrganizations.map((org, index) => {
     // Find all member_of relationships pointing to this organization
     const memberIds = memberOfRelationships
@@ -90,6 +95,17 @@ function GraphViewPage() {
       color: colors[index % colors.length],
     }
   }).filter(org => org.memberIds.length >= 2) // Only show orgs with 2+ members
+
+  // 6b. Build org-to-org links (only between visible orgs)
+  const visibleOrgGroupIds = new Set(organizationGroups.map(o => o.id))
+  const orgLinks = orgToOrgRelationships
+    .filter(r => visibleOrgGroupIds.has(r.fromNoteId) && visibleOrgGroupIds.has(r.toNoteId))
+    .map(r => ({
+      sourceOrgId: r.fromNoteId,
+      targetOrgId: r.toNoteId,
+      relationshipType: r.relationshipType as 'ally' | 'enemy',
+      pageNumber: r.pageNumber,
+    }))
 
   // 7. Transform to graph format
   const nodes = visibleCharacters.map(note => ({
@@ -160,6 +176,7 @@ function GraphViewPage() {
           nodes={nodes}
           edges={edges}
           organizations={organizationGroups}
+          orgLinks={orgLinks}
           onNodeClick={handleNodeClick}
         />
       </div>

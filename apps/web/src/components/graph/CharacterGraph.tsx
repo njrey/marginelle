@@ -27,6 +27,13 @@ interface OrganizationGroup {
   color: string
 }
 
+interface OrgLink {
+  sourceOrgId: string
+  targetOrgId: string
+  relationshipType: 'ally' | 'enemy'
+  pageNumber: number
+}
+
 // D3 augmented node type (adds x, y, vx, vy, fx, fy)
 interface ForceNode extends GraphNode {
   x?: number
@@ -41,10 +48,11 @@ interface CharacterGraphProps {
   nodes: GraphNode[]
   edges: GraphEdge[]
   organizations?: OrganizationGroup[]
+  orgLinks?: OrgLink[]
   onNodeClick?: (nodeId: string) => void
 }
 
-export function CharacterGraph({ nodes, edges, organizations = [], onNodeClick }: CharacterGraphProps) {
+export function CharacterGraph({ nodes, edges, organizations = [], orgLinks = [], onNodeClick }: CharacterGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const simulationRef = useRef<d3Force.Simulation<ForceNode, undefined> | null>(null)
 
@@ -60,8 +68,9 @@ export function CharacterGraph({ nodes, edges, organizations = [], onNodeClick }
     const svg = d3Selection.select(svgRef.current)
     const g = svg.append('g')
 
-    // Create layers for proper z-ordering (hulls behind everything)
+    // Create layers for proper z-ordering
     const hullLayer = g.append('g').attr('class', 'hulls')
+    const orgLinkLayer = g.append('g').attr('class', 'org-links')
     const linkLayer = g.append('g').attr('class', 'links')
     const nodeLayer = g.append('g').attr('class', 'nodes')
 
@@ -172,6 +181,9 @@ export function CharacterGraph({ nodes, edges, organizations = [], onNodeClick }
       hullLayer.selectAll('path').remove()
       hullLayer.selectAll('text').remove()
 
+      // Store centroids for org-to-org links
+      const orgCentroids = new Map<string, [number, number]>()
+
       organizations.forEach(org => {
         // Get the positions of all member nodes
         const memberNodes = nodesCopy.filter(n => org.memberIds.includes(n.id))
@@ -190,6 +202,10 @@ export function CharacterGraph({ nodes, edges, organizations = [], onNodeClick }
 
         // Expand hull outward for padding
         const centroid = d3Polygon.polygonCentroid(hull)
+
+        // Store centroid for org-to-org links
+        orgCentroids.set(org.id, centroid)
+
         const paddedHull = hull.map(point => {
           const dx = point[0] - centroid[0]
           const dy = point[1] - centroid[1]
@@ -226,6 +242,44 @@ export function CharacterGraph({ nodes, edges, organizations = [], onNodeClick }
           .attr('opacity', 0.7)
           .text(org.name)
       })
+
+      // Draw org-to-org links
+      orgLinkLayer.selectAll('line').remove()
+      orgLinkLayer.selectAll('text').remove()
+
+      orgLinks.forEach(link => {
+        const sourceCentroid = orgCentroids.get(link.sourceOrgId)
+        const targetCentroid = orgCentroids.get(link.targetOrgId)
+
+        if (!sourceCentroid || !targetCentroid) return
+
+        // Draw the link line
+        const isAlly = link.relationshipType === 'ally'
+        orgLinkLayer.append('line')
+          .attr('x1', sourceCentroid[0])
+          .attr('y1', sourceCentroid[1])
+          .attr('x2', targetCentroid[0])
+          .attr('y2', targetCentroid[1])
+          .attr('stroke', isAlly ? '#10b981' : '#ef4444') // green for ally, red for enemy
+          .attr('stroke-width', 3)
+          .attr('stroke-opacity', 0.6)
+          .attr('stroke-dasharray', isAlly ? '0' : '10,5') // solid for ally, dashed for enemy
+
+        // Add relationship label at midpoint
+        const midX = (sourceCentroid[0] + targetCentroid[0]) / 2
+        const midY = (sourceCentroid[1] + targetCentroid[1]) / 2
+
+        orgLinkLayer.append('text')
+          .attr('x', midX)
+          .attr('y', midY - 5)
+          .attr('text-anchor', 'middle')
+          .attr('fill', isAlly ? '#10b981' : '#ef4444')
+          .attr('font-size', '11px')
+          .attr('font-weight', 'bold')
+          .attr('opacity', 0.8)
+          .style('text-shadow', '0 0 3px white, 0 0 3px white')
+          .text(isAlly ? 'ALLY' : 'ENEMY')
+      })
     }
 
     // Update positions on tick
@@ -245,7 +299,7 @@ export function CharacterGraph({ nodes, edges, organizations = [], onNodeClick }
     return () => {
       simulation.stop()
     }
-  }, [nodes, edges, organizations, onNodeClick])
+  }, [nodes, edges, organizations, orgLinks, onNodeClick])
 
   return (
     <Card className="p-4">
