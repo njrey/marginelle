@@ -20,9 +20,6 @@ const diagnostics: string[] = []
 // Check OPFS support
 if (navigator.storage?.getDirectory) {
   diagnostics.push('✓ OPFS API available')
-  navigator.storage.getDirectory()
-    .then(() => alert('✓ OPFS getDirectory() works'))
-    .catch((e) => alert('✗ OPFS getDirectory() failed: ' + e.message))
 } else {
   diagnostics.push('✗ OPFS NOT available')
 }
@@ -45,6 +42,17 @@ if (typeof Worker !== 'undefined') {
 diagnostics.push('Sync URL: ' + (import.meta.env.VITE_LIVESTORE_SYNC_URL || 'NOT SET'))
 
 alert('Mobile Diagnostics:\n' + diagnostics.join('\n'))
+
+// Test OPFS async (separate alert)
+if (navigator.storage?.getDirectory) {
+  try {
+    navigator.storage.getDirectory()
+      .then(() => alert('✓ OPFS getDirectory() works'))
+      .catch((e) => alert('✗ OPFS getDirectory() rejected: ' + e.message))
+  } catch (e) {
+    alert('✗ OPFS getDirectory() threw sync error: ' + (e instanceof Error ? e.message : String(e)))
+  }
+}
 // END DEBUG
 
 const router = createRouter({ routeTree })
