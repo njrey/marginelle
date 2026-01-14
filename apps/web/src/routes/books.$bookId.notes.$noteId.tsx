@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useStore } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
-import { tables, type Note } from '@/livestore/schema'
+import { tables, events, type Note } from '@/livestore/schema'
 import { useBookProgress } from '@/contexts/BookProgressContext'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/books/$bookId/notes/$noteId')({
   component: NoteDetailPage,
@@ -13,6 +14,7 @@ function NoteDetailPage() {
   const { bookId, noteId } = Route.useParams()
   const { store } = useStore()
   const { currentPage } = useBookProgress()
+  const navigate = useNavigate()
 
   // Query the note
   const note$ = queryDb(
@@ -34,6 +36,34 @@ function NoteDetailPage() {
     { label: `relationships-for-note-${noteId}` }
   )
   const allRelationships = store.useQuery(relationships$)
+
+  const handleDeleteNote = () => {
+    if (!confirm(`Delete note "${note?.title}"? This cannot be undone.`)) {
+      return
+    }
+
+    const now = new Date()
+
+    // Delete relationships involving this note
+    for (const rel of allRelationships || []) {
+      if (rel.fromNoteId === noteId || rel.toNoteId === noteId) {
+        store.commit(events.relationshipDeleted({ id: rel.id, deletedAt: now }))
+      }
+    }
+
+    // Delete the note
+    store.commit(events.noteDeleted({ id: noteId, deletedAt: now }))
+
+    navigate({ to: '/books/$bookId/notes', params: { bookId } })
+  }
+
+  const handleDeleteRelationship = (relId: string) => {
+    if (!confirm('Delete this relationship? This cannot be undone.')) {
+      return
+    }
+
+    store.commit(events.relationshipDeleted({ id: relId, deletedAt: new Date() }))
+  }
 
   if (!note) return <div className="text-red-600">Note not found</div>
 
@@ -99,14 +129,19 @@ function NoteDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Back link */}
-      <Link
-        to="/books/$bookId/notes"
-        params={{ bookId }}
-        className="text-blue-600 hover:text-blue-800 underline text-sm"
-      >
-        ← Back to Notes
-      </Link>
+      {/* Back link and actions */}
+      <div className="flex justify-between items-center">
+        <Link
+          to="/books/$bookId/notes"
+          params={{ bookId }}
+          className="text-blue-600 hover:text-blue-800 underline text-sm"
+        >
+          ← Back to Notes
+        </Link>
+        <Button variant="destructive" size="sm" onClick={handleDeleteNote}>
+          Delete Note
+        </Button>
+      </div>
 
       {/* Note Details */}
       <div className="border border-gray-300 rounded-lg p-6">
@@ -166,6 +201,14 @@ function NoteDetailPage() {
                           {rel.description && (
                             <span className="text-gray-600 text-xs italic">"{rel.description}"</span>
                           )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-5 px-1 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteRelationship(rel.id)}
+                          >
+                            ×
+                          </Button>
                         </div>
                       ))}
                     </div>
@@ -218,6 +261,14 @@ function NoteDetailPage() {
                           {rel.description && (
                             <span className="text-gray-600 text-xs italic">"{rel.description}"</span>
                           )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-5 px-1 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteRelationship(rel.id)}
+                          >
+                            ×
+                          </Button>
                         </div>
                       ))}
                     </div>

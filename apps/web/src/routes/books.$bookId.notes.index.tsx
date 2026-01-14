@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useStore } from '@livestore/react'
 import { queryDb } from '@livestore/livestore'
-import { tables } from '@/livestore/schema'
+import { tables, events } from '@/livestore/schema'
 import { useBookProgress } from '@/contexts/BookProgressContext'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/books/$bookId/notes/')({
   component: NotesListPage,
@@ -19,7 +20,36 @@ function NotesListPage() {
     () => tables.notes.where({ bookId, deletedAt: null }),
     { label: `notes-for-book-${bookId}` }
   )
+
+  const relationships$ = queryDb(
+    () => tables.noteRelationships.where({ deletedAt: null }),
+    { label: `relationships-for-note-delete` }
+  )
+
   const allNotes = store.useQuery(notes$)
+  const relationships = store.useQuery(relationships$)
+
+  const handleDeleteNote = (e: React.MouseEvent, noteId: string, noteTitle: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!confirm(`Delete note "${noteTitle}"? This cannot be undone.`)) {
+      return
+    }
+
+    const now = new Date()
+
+    // Delete relationships involving this note
+    for (const rel of relationships) {
+      if (rel.fromNoteId === noteId || rel.toNoteId === noteId) {
+        store.commit(events.relationshipDeleted({ id: rel.id, deletedAt: now }))
+      }
+    }
+
+    // Delete the note
+    store.commit(events.noteDeleted({ id: noteId, deletedAt: now }))
+  }
+
   const allNotesMutable = [...allNotes]
 
   // Filter notes by current page progress
@@ -79,10 +109,18 @@ function NotesListPage() {
                 <p className="text-muted-foreground text-sm line-clamp-3">{note.content}</p>
               </CardContent>
             )}
-            <CardFooter>
+            <CardFooter className="flex justify-between items-center">
               <span className="text-xs text-muted-foreground">
                 Created: {new Date(note.createdAt).toLocaleDateString()}
               </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={(e) => handleDeleteNote(e, note.id, note.title)}
+              >
+                Delete
+              </Button>
             </CardFooter>
           </Card>
         </Link>
