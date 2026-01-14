@@ -18,3 +18,9 @@
 
 ## Functional
 - Auth, users
+
+## Bugs
+- Mobile not working
+
+## Maintenance
+- Latest Livestore

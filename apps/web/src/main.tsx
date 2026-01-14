@@ -14,17 +14,58 @@ import LiveStoreSharedWorker from '@livestore/adapter-web/shared-worker?sharedwo
 
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 
+// DEBUG: Mobile diagnostic alerts (remove after debugging)
+const diagnostics: string[] = []
+
+// Check OPFS support
+if (navigator.storage?.getDirectory) {
+  diagnostics.push('✓ OPFS API available')
+  navigator.storage.getDirectory()
+    .then(() => alert('✓ OPFS getDirectory() works'))
+    .catch((e) => alert('✗ OPFS getDirectory() failed: ' + e.message))
+} else {
+  diagnostics.push('✗ OPFS NOT available')
+}
+
+// Check SharedWorker support
+if (typeof SharedWorker !== 'undefined') {
+  diagnostics.push('✓ SharedWorker available')
+} else {
+  diagnostics.push('✗ SharedWorker NOT available')
+}
+
+// Check regular Worker support
+if (typeof Worker !== 'undefined') {
+  diagnostics.push('✓ Worker available')
+} else {
+  diagnostics.push('✗ Worker NOT available')
+}
+
+// Show sync URL
+diagnostics.push('Sync URL: ' + (import.meta.env.VITE_LIVESTORE_SYNC_URL || 'NOT SET'))
+
+alert('Mobile Diagnostics:\n' + diagnostics.join('\n'))
+// END DEBUG
+
 const router = createRouter({ routeTree })
 const qc = new QueryClient()
 
 declare module '@tanstack/react-router' {
   interface Register { router: typeof router }
 }
-const adapter = makePersistedAdapter({
-  storage: { type: 'opfs' },
-  worker: LiveStoreWorker,
-  sharedWorker: LiveStoreSharedWorker,
-})
+
+let adapter: ReturnType<typeof makePersistedAdapter>
+try {
+  adapter = makePersistedAdapter({
+    storage: { type: 'opfs' },
+    worker: LiveStoreWorker,
+    sharedWorker: LiveStoreSharedWorker,
+  })
+  alert('✓ Adapter created successfully')
+} catch (e) {
+  alert('✗ Adapter creation failed: ' + (e instanceof Error ? e.message : String(e)))
+  throw e
+}
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <LiveStoreProvider schema={schema} adapter={adapter} batchUpdates={batchUpdates}>
