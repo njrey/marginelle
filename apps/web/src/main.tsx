@@ -17,18 +17,25 @@ import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 // DEBUG: Mobile diagnostic alerts (remove after debugging)
 const diagnostics: string[] = []
 
+console.log('main')
 // Check OPFS support
+
 if (navigator.storage?.getDirectory) {
   diagnostics.push('✓ OPFS API available')
+  console.log('✓ OPFS API available')
 } else {
   diagnostics.push('✗ OPFS NOT available')
+  console.log('✗ OPFS NOT available')
 }
 
 // Check SharedWorker support
+console.log('checking SharedWorker')
 if (typeof SharedWorker !== 'undefined') {
+  console.log('SharedWorker available')
   diagnostics.push('✓ SharedWorker available')
 } else {
   diagnostics.push('✗ SharedWorker NOT available')
+  console.log('SharedWorker not available')
 }
 
 // Check regular Worker support
