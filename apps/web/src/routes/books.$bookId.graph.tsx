@@ -69,7 +69,7 @@ function GraphViewPage() {
   )
 
   // 6. Build organization groups with member lists
-  const visibleOrgIds = new Set(visibleOrganizations.map(o => o.id))
+  //const visibleOrgIds = new Set(visibleOrganizations.map(o => o.id))
   const organizationGroups = visibleOrganizations.map((org, index) => {
     // Find all member_of relationships pointing to this organization
     const memberIds = memberOfRelationships

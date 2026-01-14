@@ -20,6 +20,7 @@ const diagnostics: string[] = []
 console.log('main')
 // Check OPFS support
 
+//@ts-ignore
 if (navigator.storage?.getDirectory) {
   diagnostics.push('✓ OPFS API available')
   console.log('✓ OPFS API available')
