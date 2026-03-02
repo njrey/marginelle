@@ -32,6 +32,56 @@ function createAuth(env: Env, request: Request) {
     ],
     emailAndPassword: {
       enabled: true,
+      password: {
+        hash: async (password) => {
+          const encoder = new TextEncoder();
+          const passwordBuffer = encoder.encode(password);
+          const saltBuffer = crypto.getRandomValues(new Uint8Array(16));
+          const keyMaterial = await crypto.subtle.importKey(
+            "raw",
+            passwordBuffer,
+            "PBKDF2",
+            false,
+            ["deriveBits"],
+          );
+          const hashBuffer = await crypto.subtle.deriveBits(
+            { name: "PBKDF2", salt: saltBuffer, iterations: 100_000, hash: "SHA-256" },
+            keyMaterial,
+            256,
+          );
+          const saltHex = Array.from(saltBuffer)
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+          const hashHex = Array.from(new Uint8Array(hashBuffer))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+          return `pbkdf2:${saltHex}:${hashHex}`;
+        },
+        verify: async ({ hash, password }) => {
+          const parts = hash.split(":");
+          if (parts.length !== 3 || parts[0] !== "pbkdf2") return false;
+          const [, saltHex, storedHashHex] = parts;
+          const saltBuffer = new Uint8Array(saltHex!.match(/.{2}/g)!.map((b) => parseInt(b, 16)));
+          const encoder = new TextEncoder();
+          const passwordBuffer = encoder.encode(password);
+          const keyMaterial = await crypto.subtle.importKey(
+            "raw",
+            passwordBuffer,
+            "PBKDF2",
+            false,
+            ["deriveBits"],
+          );
+          const hashBuffer = await crypto.subtle.deriveBits(
+            { name: "PBKDF2", salt: saltBuffer, iterations: 100_000, hash: "SHA-256" },
+            keyMaterial,
+            256,
+          );
+          const hashHex = Array.from(new Uint8Array(hashBuffer))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+          return hashHex === storedHashHex;
+        },
+      },
     },
   });
 }
