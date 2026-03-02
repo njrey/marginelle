@@ -37,7 +37,7 @@ function App() {
     );
   }
 
-  if (!session) {
+  if (!session?.user) {
     // No session — render the router without LiveStore so /login and /register work
     return (
       <QueryClientProvider client={qc}>
