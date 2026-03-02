@@ -30,6 +30,16 @@ function createAuth(env: Env, request: Request) {
       "http://localhost:60001",
       "http://localhost:5173",
     ],
+    advanced: {
+      crossSubDomainCookies: {
+        enabled: false,
+      },
+      defaultCookieAttributes: {
+        sameSite: "none",
+        secure: true,
+        partitioned: true,
+      },
+    },
     emailAndPassword: {
       enabled: true,
       password: {
