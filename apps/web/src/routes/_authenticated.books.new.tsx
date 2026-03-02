@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { BookForm } from '@/components/forms/BookForm'
 
-export const Route = createFileRoute('/books/new')({
+export const Route = createFileRoute('/_authenticated/books/new')({
   component: NewBookPage,
 })
 

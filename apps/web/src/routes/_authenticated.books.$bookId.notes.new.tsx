@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { NoteForm } from '@/components/forms/NoteForm'
 
-export const Route = createFileRoute('/books/$bookId/notes/new')({
+export const Route = createFileRoute('/_authenticated/books/$bookId/notes/new')({
   component: NewNotePage,
 })
 

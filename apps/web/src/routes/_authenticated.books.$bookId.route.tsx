@@ -4,7 +4,7 @@ import { queryDb } from '@livestore/livestore'
 import { tables } from '@/livestore/schema'
 import { BookProgressProvider } from '@/contexts/BookProgressContext'
 
-export const Route = createFileRoute('/books/$bookId')({
+export const Route = createFileRoute('/_authenticated/books/$bookId')({
   component: BookDetailLayout,
 })
 

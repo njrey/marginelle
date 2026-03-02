@@ -4,7 +4,7 @@ import { queryDb } from '@livestore/livestore'
 import { tables, events } from '@/livestore/schema'
 import { Button } from '@/components/ui/button'
 
-export const Route = createFileRoute('/books/$bookId/')({
+export const Route = createFileRoute('/_authenticated/books/$bookId/')({
   component: BookDetailIndexPage,
 })
 

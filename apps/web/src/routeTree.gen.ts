@@ -9,22 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as BooksRouteRouteImport } from './routes/books.route'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as BooksNewRouteImport } from './routes/books.new'
-import { Route as BooksListRouteImport } from './routes/books.list'
-import { Route as BooksBookIdRouteRouteImport } from './routes/books.$bookId.route'
-import { Route as BooksBookIdIndexRouteImport } from './routes/books.$bookId.index'
-import { Route as BooksBookIdGraphRouteImport } from './routes/books.$bookId.graph'
-import { Route as BooksBookIdNotesRouteRouteImport } from './routes/books.$bookId.notes.route'
-import { Route as BooksBookIdNotesIndexRouteImport } from './routes/books.$bookId.notes.index'
-import { Route as BooksBookIdNotesNewRouteImport } from './routes/books.$bookId.notes.new'
-import { Route as BooksBookIdNotesNoteIdRouteImport } from './routes/books.$bookId.notes.$noteId'
-import { Route as BooksBookIdNotesRelationshipsNewRouteImport } from './routes/books.$bookId.notes.relationships.new'
+import { Route as AuthenticatedBooksRouteRouteImport } from './routes/_authenticated.books.route'
+import { Route as AuthenticatedBooksNewRouteImport } from './routes/_authenticated.books.new'
+import { Route as AuthenticatedBooksListRouteImport } from './routes/_authenticated.books.list'
+import { Route as AuthenticatedBooksBookIdRouteRouteImport } from './routes/_authenticated.books.$bookId.route'
+import { Route as AuthenticatedBooksBookIdIndexRouteImport } from './routes/_authenticated.books.$bookId.index'
+import { Route as AuthenticatedBooksBookIdGraphRouteImport } from './routes/_authenticated.books.$bookId.graph'
+import { Route as AuthenticatedBooksBookIdNotesRouteRouteImport } from './routes/_authenticated.books.$bookId.notes.route'
+import { Route as AuthenticatedBooksBookIdNotesIndexRouteImport } from './routes/_authenticated.books.$bookId.notes.index'
+import { Route as AuthenticatedBooksBookIdNotesNewRouteImport } from './routes/_authenticated.books.$bookId.notes.new'
+import { Route as AuthenticatedBooksBookIdNotesNoteIdRouteImport } from './routes/_authenticated.books.$bookId.notes.$noteId'
+import { Route as AuthenticatedBooksBookIdNotesRelationshipsNewRouteImport } from './routes/_authenticated.books.$bookId.notes.relationships.new'
 
-const BooksRouteRoute = BooksRouteRouteImport.update({
-  id: '/books',
-  path: '/books',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -32,103 +44,124 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BooksNewRoute = BooksNewRouteImport.update({
+const AuthenticatedBooksRouteRoute = AuthenticatedBooksRouteRouteImport.update({
+  id: '/books',
+  path: '/books',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedBooksNewRoute = AuthenticatedBooksNewRouteImport.update({
   id: '/new',
   path: '/new',
-  getParentRoute: () => BooksRouteRoute,
+  getParentRoute: () => AuthenticatedBooksRouteRoute,
 } as any)
-const BooksListRoute = BooksListRouteImport.update({
+const AuthenticatedBooksListRoute = AuthenticatedBooksListRouteImport.update({
   id: '/list',
   path: '/list',
-  getParentRoute: () => BooksRouteRoute,
+  getParentRoute: () => AuthenticatedBooksRouteRoute,
 } as any)
-const BooksBookIdRouteRoute = BooksBookIdRouteRouteImport.update({
-  id: '/$bookId',
-  path: '/$bookId',
-  getParentRoute: () => BooksRouteRoute,
-} as any)
-const BooksBookIdIndexRoute = BooksBookIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => BooksBookIdRouteRoute,
-} as any)
-const BooksBookIdGraphRoute = BooksBookIdGraphRouteImport.update({
-  id: '/graph',
-  path: '/graph',
-  getParentRoute: () => BooksBookIdRouteRoute,
-} as any)
-const BooksBookIdNotesRouteRoute = BooksBookIdNotesRouteRouteImport.update({
-  id: '/notes',
-  path: '/notes',
-  getParentRoute: () => BooksBookIdRouteRoute,
-} as any)
-const BooksBookIdNotesIndexRoute = BooksBookIdNotesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => BooksBookIdNotesRouteRoute,
-} as any)
-const BooksBookIdNotesNewRoute = BooksBookIdNotesNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => BooksBookIdNotesRouteRoute,
-} as any)
-const BooksBookIdNotesNoteIdRoute = BooksBookIdNotesNoteIdRouteImport.update({
-  id: '/$noteId',
-  path: '/$noteId',
-  getParentRoute: () => BooksBookIdNotesRouteRoute,
-} as any)
-const BooksBookIdNotesRelationshipsNewRoute =
-  BooksBookIdNotesRelationshipsNewRouteImport.update({
+const AuthenticatedBooksBookIdRouteRoute =
+  AuthenticatedBooksBookIdRouteRouteImport.update({
+    id: '/$bookId',
+    path: '/$bookId',
+    getParentRoute: () => AuthenticatedBooksRouteRoute,
+  } as any)
+const AuthenticatedBooksBookIdIndexRoute =
+  AuthenticatedBooksBookIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedBooksBookIdRouteRoute,
+  } as any)
+const AuthenticatedBooksBookIdGraphRoute =
+  AuthenticatedBooksBookIdGraphRouteImport.update({
+    id: '/graph',
+    path: '/graph',
+    getParentRoute: () => AuthenticatedBooksBookIdRouteRoute,
+  } as any)
+const AuthenticatedBooksBookIdNotesRouteRoute =
+  AuthenticatedBooksBookIdNotesRouteRouteImport.update({
+    id: '/notes',
+    path: '/notes',
+    getParentRoute: () => AuthenticatedBooksBookIdRouteRoute,
+  } as any)
+const AuthenticatedBooksBookIdNotesIndexRoute =
+  AuthenticatedBooksBookIdNotesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedBooksBookIdNotesRouteRoute,
+  } as any)
+const AuthenticatedBooksBookIdNotesNewRoute =
+  AuthenticatedBooksBookIdNotesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedBooksBookIdNotesRouteRoute,
+  } as any)
+const AuthenticatedBooksBookIdNotesNoteIdRoute =
+  AuthenticatedBooksBookIdNotesNoteIdRouteImport.update({
+    id: '/$noteId',
+    path: '/$noteId',
+    getParentRoute: () => AuthenticatedBooksBookIdNotesRouteRoute,
+  } as any)
+const AuthenticatedBooksBookIdNotesRelationshipsNewRoute =
+  AuthenticatedBooksBookIdNotesRelationshipsNewRouteImport.update({
     id: '/relationships/new',
     path: '/relationships/new',
-    getParentRoute: () => BooksBookIdNotesRouteRoute,
+    getParentRoute: () => AuthenticatedBooksBookIdNotesRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/books': typeof BooksRouteRouteWithChildren
-  '/books/$bookId': typeof BooksBookIdRouteRouteWithChildren
-  '/books/list': typeof BooksListRoute
-  '/books/new': typeof BooksNewRoute
-  '/books/$bookId/notes': typeof BooksBookIdNotesRouteRouteWithChildren
-  '/books/$bookId/graph': typeof BooksBookIdGraphRoute
-  '/books/$bookId/': typeof BooksBookIdIndexRoute
-  '/books/$bookId/notes/$noteId': typeof BooksBookIdNotesNoteIdRoute
-  '/books/$bookId/notes/new': typeof BooksBookIdNotesNewRoute
-  '/books/$bookId/notes/': typeof BooksBookIdNotesIndexRoute
-  '/books/$bookId/notes/relationships/new': typeof BooksBookIdNotesRelationshipsNewRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/books': typeof AuthenticatedBooksRouteRouteWithChildren
+  '/books/$bookId': typeof AuthenticatedBooksBookIdRouteRouteWithChildren
+  '/books/list': typeof AuthenticatedBooksListRoute
+  '/books/new': typeof AuthenticatedBooksNewRoute
+  '/books/$bookId/notes': typeof AuthenticatedBooksBookIdNotesRouteRouteWithChildren
+  '/books/$bookId/graph': typeof AuthenticatedBooksBookIdGraphRoute
+  '/books/$bookId/': typeof AuthenticatedBooksBookIdIndexRoute
+  '/books/$bookId/notes/$noteId': typeof AuthenticatedBooksBookIdNotesNoteIdRoute
+  '/books/$bookId/notes/new': typeof AuthenticatedBooksBookIdNotesNewRoute
+  '/books/$bookId/notes/': typeof AuthenticatedBooksBookIdNotesIndexRoute
+  '/books/$bookId/notes/relationships/new': typeof AuthenticatedBooksBookIdNotesRelationshipsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/books': typeof BooksRouteRouteWithChildren
-  '/books/list': typeof BooksListRoute
-  '/books/new': typeof BooksNewRoute
-  '/books/$bookId/graph': typeof BooksBookIdGraphRoute
-  '/books/$bookId': typeof BooksBookIdIndexRoute
-  '/books/$bookId/notes/$noteId': typeof BooksBookIdNotesNoteIdRoute
-  '/books/$bookId/notes/new': typeof BooksBookIdNotesNewRoute
-  '/books/$bookId/notes': typeof BooksBookIdNotesIndexRoute
-  '/books/$bookId/notes/relationships/new': typeof BooksBookIdNotesRelationshipsNewRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/books': typeof AuthenticatedBooksRouteRouteWithChildren
+  '/books/list': typeof AuthenticatedBooksListRoute
+  '/books/new': typeof AuthenticatedBooksNewRoute
+  '/books/$bookId/graph': typeof AuthenticatedBooksBookIdGraphRoute
+  '/books/$bookId': typeof AuthenticatedBooksBookIdIndexRoute
+  '/books/$bookId/notes/$noteId': typeof AuthenticatedBooksBookIdNotesNoteIdRoute
+  '/books/$bookId/notes/new': typeof AuthenticatedBooksBookIdNotesNewRoute
+  '/books/$bookId/notes': typeof AuthenticatedBooksBookIdNotesIndexRoute
+  '/books/$bookId/notes/relationships/new': typeof AuthenticatedBooksBookIdNotesRelationshipsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/books': typeof BooksRouteRouteWithChildren
-  '/books/$bookId': typeof BooksBookIdRouteRouteWithChildren
-  '/books/list': typeof BooksListRoute
-  '/books/new': typeof BooksNewRoute
-  '/books/$bookId/notes': typeof BooksBookIdNotesRouteRouteWithChildren
-  '/books/$bookId/graph': typeof BooksBookIdGraphRoute
-  '/books/$bookId/': typeof BooksBookIdIndexRoute
-  '/books/$bookId/notes/$noteId': typeof BooksBookIdNotesNoteIdRoute
-  '/books/$bookId/notes/new': typeof BooksBookIdNotesNewRoute
-  '/books/$bookId/notes/': typeof BooksBookIdNotesIndexRoute
-  '/books/$bookId/notes/relationships/new': typeof BooksBookIdNotesRelationshipsNewRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/_authenticated/books': typeof AuthenticatedBooksRouteRouteWithChildren
+  '/_authenticated/books/$bookId': typeof AuthenticatedBooksBookIdRouteRouteWithChildren
+  '/_authenticated/books/list': typeof AuthenticatedBooksListRoute
+  '/_authenticated/books/new': typeof AuthenticatedBooksNewRoute
+  '/_authenticated/books/$bookId/notes': typeof AuthenticatedBooksBookIdNotesRouteRouteWithChildren
+  '/_authenticated/books/$bookId/graph': typeof AuthenticatedBooksBookIdGraphRoute
+  '/_authenticated/books/$bookId/': typeof AuthenticatedBooksBookIdIndexRoute
+  '/_authenticated/books/$bookId/notes/$noteId': typeof AuthenticatedBooksBookIdNotesNoteIdRoute
+  '/_authenticated/books/$bookId/notes/new': typeof AuthenticatedBooksBookIdNotesNewRoute
+  '/_authenticated/books/$bookId/notes/': typeof AuthenticatedBooksBookIdNotesIndexRoute
+  '/_authenticated/books/$bookId/notes/relationships/new': typeof AuthenticatedBooksBookIdNotesRelationshipsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
+    | '/register'
     | '/books'
     | '/books/$bookId'
     | '/books/list'
@@ -143,6 +176,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
+    | '/register'
     | '/books'
     | '/books/list'
     | '/books/new'
@@ -155,31 +190,50 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/books'
-    | '/books/$bookId'
-    | '/books/list'
-    | '/books/new'
-    | '/books/$bookId/notes'
-    | '/books/$bookId/graph'
-    | '/books/$bookId/'
-    | '/books/$bookId/notes/$noteId'
-    | '/books/$bookId/notes/new'
-    | '/books/$bookId/notes/'
-    | '/books/$bookId/notes/relationships/new'
+    | '/_authenticated'
+    | '/login'
+    | '/register'
+    | '/_authenticated/books'
+    | '/_authenticated/books/$bookId'
+    | '/_authenticated/books/list'
+    | '/_authenticated/books/new'
+    | '/_authenticated/books/$bookId/notes'
+    | '/_authenticated/books/$bookId/graph'
+    | '/_authenticated/books/$bookId/'
+    | '/_authenticated/books/$bookId/notes/$noteId'
+    | '/_authenticated/books/$bookId/notes/new'
+    | '/_authenticated/books/$bookId/notes/'
+    | '/_authenticated/books/$bookId/notes/relationships/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BooksRouteRoute: typeof BooksRouteRouteWithChildren
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/books': {
-      id: '/books'
-      path: '/books'
-      fullPath: '/books'
-      preLoaderRoute: typeof BooksRouteRouteImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -189,132 +243,165 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/books/new': {
-      id: '/books/new'
+    '/_authenticated/books': {
+      id: '/_authenticated/books'
+      path: '/books'
+      fullPath: '/books'
+      preLoaderRoute: typeof AuthenticatedBooksRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/books/new': {
+      id: '/_authenticated/books/new'
       path: '/new'
       fullPath: '/books/new'
-      preLoaderRoute: typeof BooksNewRouteImport
-      parentRoute: typeof BooksRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksNewRouteImport
+      parentRoute: typeof AuthenticatedBooksRouteRoute
     }
-    '/books/list': {
-      id: '/books/list'
+    '/_authenticated/books/list': {
+      id: '/_authenticated/books/list'
       path: '/list'
       fullPath: '/books/list'
-      preLoaderRoute: typeof BooksListRouteImport
-      parentRoute: typeof BooksRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksListRouteImport
+      parentRoute: typeof AuthenticatedBooksRouteRoute
     }
-    '/books/$bookId': {
-      id: '/books/$bookId'
+    '/_authenticated/books/$bookId': {
+      id: '/_authenticated/books/$bookId'
       path: '/$bookId'
       fullPath: '/books/$bookId'
-      preLoaderRoute: typeof BooksBookIdRouteRouteImport
-      parentRoute: typeof BooksRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksBookIdRouteRouteImport
+      parentRoute: typeof AuthenticatedBooksRouteRoute
     }
-    '/books/$bookId/': {
-      id: '/books/$bookId/'
+    '/_authenticated/books/$bookId/': {
+      id: '/_authenticated/books/$bookId/'
       path: '/'
       fullPath: '/books/$bookId/'
-      preLoaderRoute: typeof BooksBookIdIndexRouteImport
-      parentRoute: typeof BooksBookIdRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksBookIdIndexRouteImport
+      parentRoute: typeof AuthenticatedBooksBookIdRouteRoute
     }
-    '/books/$bookId/graph': {
-      id: '/books/$bookId/graph'
+    '/_authenticated/books/$bookId/graph': {
+      id: '/_authenticated/books/$bookId/graph'
       path: '/graph'
       fullPath: '/books/$bookId/graph'
-      preLoaderRoute: typeof BooksBookIdGraphRouteImport
-      parentRoute: typeof BooksBookIdRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksBookIdGraphRouteImport
+      parentRoute: typeof AuthenticatedBooksBookIdRouteRoute
     }
-    '/books/$bookId/notes': {
-      id: '/books/$bookId/notes'
+    '/_authenticated/books/$bookId/notes': {
+      id: '/_authenticated/books/$bookId/notes'
       path: '/notes'
       fullPath: '/books/$bookId/notes'
-      preLoaderRoute: typeof BooksBookIdNotesRouteRouteImport
-      parentRoute: typeof BooksBookIdRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksBookIdNotesRouteRouteImport
+      parentRoute: typeof AuthenticatedBooksBookIdRouteRoute
     }
-    '/books/$bookId/notes/': {
-      id: '/books/$bookId/notes/'
+    '/_authenticated/books/$bookId/notes/': {
+      id: '/_authenticated/books/$bookId/notes/'
       path: '/'
       fullPath: '/books/$bookId/notes/'
-      preLoaderRoute: typeof BooksBookIdNotesIndexRouteImport
-      parentRoute: typeof BooksBookIdNotesRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksBookIdNotesIndexRouteImport
+      parentRoute: typeof AuthenticatedBooksBookIdNotesRouteRoute
     }
-    '/books/$bookId/notes/new': {
-      id: '/books/$bookId/notes/new'
+    '/_authenticated/books/$bookId/notes/new': {
+      id: '/_authenticated/books/$bookId/notes/new'
       path: '/new'
       fullPath: '/books/$bookId/notes/new'
-      preLoaderRoute: typeof BooksBookIdNotesNewRouteImport
-      parentRoute: typeof BooksBookIdNotesRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksBookIdNotesNewRouteImport
+      parentRoute: typeof AuthenticatedBooksBookIdNotesRouteRoute
     }
-    '/books/$bookId/notes/$noteId': {
-      id: '/books/$bookId/notes/$noteId'
+    '/_authenticated/books/$bookId/notes/$noteId': {
+      id: '/_authenticated/books/$bookId/notes/$noteId'
       path: '/$noteId'
       fullPath: '/books/$bookId/notes/$noteId'
-      preLoaderRoute: typeof BooksBookIdNotesNoteIdRouteImport
-      parentRoute: typeof BooksBookIdNotesRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksBookIdNotesNoteIdRouteImport
+      parentRoute: typeof AuthenticatedBooksBookIdNotesRouteRoute
     }
-    '/books/$bookId/notes/relationships/new': {
-      id: '/books/$bookId/notes/relationships/new'
+    '/_authenticated/books/$bookId/notes/relationships/new': {
+      id: '/_authenticated/books/$bookId/notes/relationships/new'
       path: '/relationships/new'
       fullPath: '/books/$bookId/notes/relationships/new'
-      preLoaderRoute: typeof BooksBookIdNotesRelationshipsNewRouteImport
-      parentRoute: typeof BooksBookIdNotesRouteRoute
+      preLoaderRoute: typeof AuthenticatedBooksBookIdNotesRelationshipsNewRouteImport
+      parentRoute: typeof AuthenticatedBooksBookIdNotesRouteRoute
     }
   }
 }
 
-interface BooksBookIdNotesRouteRouteChildren {
-  BooksBookIdNotesNoteIdRoute: typeof BooksBookIdNotesNoteIdRoute
-  BooksBookIdNotesNewRoute: typeof BooksBookIdNotesNewRoute
-  BooksBookIdNotesIndexRoute: typeof BooksBookIdNotesIndexRoute
-  BooksBookIdNotesRelationshipsNewRoute: typeof BooksBookIdNotesRelationshipsNewRoute
+interface AuthenticatedBooksBookIdNotesRouteRouteChildren {
+  AuthenticatedBooksBookIdNotesNoteIdRoute: typeof AuthenticatedBooksBookIdNotesNoteIdRoute
+  AuthenticatedBooksBookIdNotesNewRoute: typeof AuthenticatedBooksBookIdNotesNewRoute
+  AuthenticatedBooksBookIdNotesIndexRoute: typeof AuthenticatedBooksBookIdNotesIndexRoute
+  AuthenticatedBooksBookIdNotesRelationshipsNewRoute: typeof AuthenticatedBooksBookIdNotesRelationshipsNewRoute
 }
 
-const BooksBookIdNotesRouteRouteChildren: BooksBookIdNotesRouteRouteChildren = {
-  BooksBookIdNotesNoteIdRoute: BooksBookIdNotesNoteIdRoute,
-  BooksBookIdNotesNewRoute: BooksBookIdNotesNewRoute,
-  BooksBookIdNotesIndexRoute: BooksBookIdNotesIndexRoute,
-  BooksBookIdNotesRelationshipsNewRoute: BooksBookIdNotesRelationshipsNewRoute,
-}
+const AuthenticatedBooksBookIdNotesRouteRouteChildren: AuthenticatedBooksBookIdNotesRouteRouteChildren =
+  {
+    AuthenticatedBooksBookIdNotesNoteIdRoute:
+      AuthenticatedBooksBookIdNotesNoteIdRoute,
+    AuthenticatedBooksBookIdNotesNewRoute:
+      AuthenticatedBooksBookIdNotesNewRoute,
+    AuthenticatedBooksBookIdNotesIndexRoute:
+      AuthenticatedBooksBookIdNotesIndexRoute,
+    AuthenticatedBooksBookIdNotesRelationshipsNewRoute:
+      AuthenticatedBooksBookIdNotesRelationshipsNewRoute,
+  }
 
-const BooksBookIdNotesRouteRouteWithChildren =
-  BooksBookIdNotesRouteRoute._addFileChildren(
-    BooksBookIdNotesRouteRouteChildren,
+const AuthenticatedBooksBookIdNotesRouteRouteWithChildren =
+  AuthenticatedBooksBookIdNotesRouteRoute._addFileChildren(
+    AuthenticatedBooksBookIdNotesRouteRouteChildren,
   )
 
-interface BooksBookIdRouteRouteChildren {
-  BooksBookIdNotesRouteRoute: typeof BooksBookIdNotesRouteRouteWithChildren
-  BooksBookIdGraphRoute: typeof BooksBookIdGraphRoute
-  BooksBookIdIndexRoute: typeof BooksBookIdIndexRoute
+interface AuthenticatedBooksBookIdRouteRouteChildren {
+  AuthenticatedBooksBookIdNotesRouteRoute: typeof AuthenticatedBooksBookIdNotesRouteRouteWithChildren
+  AuthenticatedBooksBookIdGraphRoute: typeof AuthenticatedBooksBookIdGraphRoute
+  AuthenticatedBooksBookIdIndexRoute: typeof AuthenticatedBooksBookIdIndexRoute
 }
 
-const BooksBookIdRouteRouteChildren: BooksBookIdRouteRouteChildren = {
-  BooksBookIdNotesRouteRoute: BooksBookIdNotesRouteRouteWithChildren,
-  BooksBookIdGraphRoute: BooksBookIdGraphRoute,
-  BooksBookIdIndexRoute: BooksBookIdIndexRoute,
+const AuthenticatedBooksBookIdRouteRouteChildren: AuthenticatedBooksBookIdRouteRouteChildren =
+  {
+    AuthenticatedBooksBookIdNotesRouteRoute:
+      AuthenticatedBooksBookIdNotesRouteRouteWithChildren,
+    AuthenticatedBooksBookIdGraphRoute: AuthenticatedBooksBookIdGraphRoute,
+    AuthenticatedBooksBookIdIndexRoute: AuthenticatedBooksBookIdIndexRoute,
+  }
+
+const AuthenticatedBooksBookIdRouteRouteWithChildren =
+  AuthenticatedBooksBookIdRouteRoute._addFileChildren(
+    AuthenticatedBooksBookIdRouteRouteChildren,
+  )
+
+interface AuthenticatedBooksRouteRouteChildren {
+  AuthenticatedBooksBookIdRouteRoute: typeof AuthenticatedBooksBookIdRouteRouteWithChildren
+  AuthenticatedBooksListRoute: typeof AuthenticatedBooksListRoute
+  AuthenticatedBooksNewRoute: typeof AuthenticatedBooksNewRoute
 }
 
-const BooksBookIdRouteRouteWithChildren =
-  BooksBookIdRouteRoute._addFileChildren(BooksBookIdRouteRouteChildren)
+const AuthenticatedBooksRouteRouteChildren: AuthenticatedBooksRouteRouteChildren =
+  {
+    AuthenticatedBooksBookIdRouteRoute:
+      AuthenticatedBooksBookIdRouteRouteWithChildren,
+    AuthenticatedBooksListRoute: AuthenticatedBooksListRoute,
+    AuthenticatedBooksNewRoute: AuthenticatedBooksNewRoute,
+  }
 
-interface BooksRouteRouteChildren {
-  BooksBookIdRouteRoute: typeof BooksBookIdRouteRouteWithChildren
-  BooksListRoute: typeof BooksListRoute
-  BooksNewRoute: typeof BooksNewRoute
+const AuthenticatedBooksRouteRouteWithChildren =
+  AuthenticatedBooksRouteRoute._addFileChildren(
+    AuthenticatedBooksRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedBooksRouteRoute: typeof AuthenticatedBooksRouteRouteWithChildren
 }
 
-const BooksRouteRouteChildren: BooksRouteRouteChildren = {
-  BooksBookIdRouteRoute: BooksBookIdRouteRouteWithChildren,
-  BooksListRoute: BooksListRoute,
-  BooksNewRoute: BooksNewRoute,
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBooksRouteRoute: AuthenticatedBooksRouteRouteWithChildren,
 }
 
-const BooksRouteRouteWithChildren = BooksRouteRoute._addFileChildren(
-  BooksRouteRouteChildren,
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BooksRouteRoute: BooksRouteRouteWithChildren,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

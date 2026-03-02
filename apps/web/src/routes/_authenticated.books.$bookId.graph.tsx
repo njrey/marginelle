@@ -9,7 +9,7 @@ import { Slider } from '@/components/ui/slider'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useState } from 'react'
 
-export const Route = createFileRoute('/books/$bookId/graph')({
+export const Route = createFileRoute('/_authenticated/books/$bookId/graph')({
   component: GraphViewPage,
 })
 

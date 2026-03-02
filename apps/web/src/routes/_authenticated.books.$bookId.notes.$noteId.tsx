@@ -6,7 +6,7 @@ import { useBookProgress } from '@/contexts/BookProgressContext'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
-export const Route = createFileRoute('/books/$bookId/notes/$noteId')({
+export const Route = createFileRoute('/_authenticated/books/$bookId/notes/$noteId')({
   component: NoteDetailPage,
 })
 

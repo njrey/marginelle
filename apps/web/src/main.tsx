@@ -9,6 +9,7 @@ import { LiveStoreProvider } from "@livestore/react";
 import { routeTree } from "./routeTree.gen";
 import { schema } from "./livestore/schema";
 import { BookSpinner } from "./components/BookSpinner";
+import { authClient } from "./lib/auth-client";
 
 import LiveStoreWorker from "./livestore/livestore.worker?worker";
 import LiveStoreSharedWorker from "@livestore/adapter-web/shared-worker?sharedworker";
@@ -24,16 +25,43 @@ declare module "@tanstack/react-router" {
   }
 }
 
-const adapter = makePersistedAdapter({
-  storage: { type: "opfs" },
-  worker: LiveStoreWorker,
-  sharedWorker: LiveStoreSharedWorker,
-});
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+function App() {
+  const { data: session, isPending } = authClient.useSession();
+
+  if (isPending) {
+    // Still checking session — show a minimal loading state
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <BookSpinner />
+      </div>
+    );
+  }
+
+  if (!session) {
+    // No session — render the router without LiveStore so /login and /register work
+    return (
+      <QueryClientProvider client={qc}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    );
+  }
+
+  // Authenticated — create a per-user adapter so each user gets their own store
+  const adapter = makePersistedAdapter({
+    storage: { type: "opfs" },
+    worker: LiveStoreWorker,
+    sharedWorker: LiveStoreSharedWorker,
+  });
+
+  return (
     <LiveStoreProvider
       schema={schema}
       adapter={adapter}
+      storeId={session.user.id}
+      syncPayload={{
+        authToken: session.session.token,
+        storeId: session.user.id,
+      }}
       batchUpdates={batchUpdates}
       renderLoading={() => (
         <div className="flex min-h-screen items-center justify-center">
@@ -45,5 +73,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <RouterProvider router={router} />
       </QueryClientProvider>
     </LiveStoreProvider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <App />
   </React.StrictMode>,
 );

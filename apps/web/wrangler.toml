@@ -1,7 +1,7 @@
 name = "websocket-server"
 main = "./src/cf-worker/index.ts"
 compatibility_date = "2025-05-08"
-# compatibility_flags = ["nodejs_compat"]
+compatibility_flags = ["nodejs_compat"]
 
 # TODO: Add your Cloudflare account ID here
 # Find it in Cloudflare Dashboard > Overview (right sidebar)
@@ -27,5 +27,7 @@ database_id = "16c74e8c-230d-474e-96f6-20b7c04962f5"
 # database_id = "${LIVESTORE_CF_SYNC_DATABASE_ID}"
 
 [vars]
-# should be set via CF dashboard (as secret)
-# ADMIN_SECRET = "..."
+APP_ORIGIN = "https://marginelle.pages.dev"
+# Secrets — set these via: wrangler secret put <NAME>
+# BETTER_AUTH_SECRET = "..."   (min 32 chars, high entropy)
+# ADMIN_SECRET = "..."         (used by LiveStore sync-cf internally)

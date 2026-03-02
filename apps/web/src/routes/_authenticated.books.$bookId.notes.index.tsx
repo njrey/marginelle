@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
-export const Route = createFileRoute('/books/$bookId/notes/')({
+export const Route = createFileRoute('/_authenticated/books/$bookId/notes/')({
   component: NotesListPage,
 })
 
