@@ -1,4 +1,5 @@
 ## Look and feel
+- Loading spinner is weird
 - make the diagrams larger
 - make diagrams and highlights timed or scroll-based
   - https://ui.aceternity.com/components/hero-highlight
