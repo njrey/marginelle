@@ -24,7 +24,12 @@ function createAuth(env: Env, request: Request) {
     },
     secret: env.BETTER_AUTH_SECRET,
     baseURL,
-    trustedOrigins: [env.APP_ORIGIN, "http://localhost:60001", "http://localhost:5173"],
+    trustedOrigins: [
+      env.APP_ORIGIN,
+      "https://marginelle.com",
+      "http://localhost:60001",
+      "http://localhost:5173",
+    ],
     emailAndPassword: {
       enabled: true,
     },
@@ -50,17 +55,20 @@ async function getUserIdFromToken(
 
 export class WebSocketServer extends makeDurableObject({}) {}
 
-const ALLOWED_ORIGINS = [
+const ALLOWED_ORIGINS = new Set([
   "http://localhost:60001",
   "http://localhost:5173",
   "https://marginelle.pages.dev",
-];
+  "https://marginelle.com",
+]);
 
 function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get("Origin") ?? "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  // Only reflect the origin back if it's explicitly allowed.
+  // Returning a hardcoded fallback for unknown origins would grant them access.
+  if (!ALLOWED_ORIGINS.has(origin)) return {};
   return {
-    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie",
     "Access-Control-Allow-Credentials": "true",
