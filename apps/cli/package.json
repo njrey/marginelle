@@ -1,0 +1,28 @@
+{
+  "name": "@marginelle/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "marginelle": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@livestore/adapter-node": "^0.3.1",
+    "@livestore/livestore": "^0.3.1",
+    "@livestore/sync-cf": "^0.3.1",
+    "@marginelle/schema": "workspace:*",
+    "commander": "^14.0.3",
+    "effect": "^3.18.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "tsup": "^8.5.1",
+    "tsx": "^4.20.5",
+    "typescript": "~5.8.3"
+  }
+}

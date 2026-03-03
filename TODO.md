@@ -14,8 +14,7 @@
 - would be nice if the above was like a timeline - a line that shows their locations as we progress through the story (via the page slider)
 
 ## Deploy
-- cloudflare durable objects
-- github actions
+- consider reverse proxy to fix cors issues?
 
 ## Functional
 - Auth, users
@@ -25,3 +24,13 @@
 
 ## Maintenance
 - Latest Livestore
+
+## Harness
+- Set up AI harness for immediate feedback - tests, etc.
+- Could AI interact with this app if I wrote like an mcp or a cli?
+
+## Security
+- did our cookie changes make it less secure?
+- did we need that change for the double-encoding?
+
+

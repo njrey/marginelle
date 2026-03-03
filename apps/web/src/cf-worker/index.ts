@@ -96,18 +96,18 @@ function createAuth(env: Env, request: Request) {
   });
 }
 
-// Verify a BetterAuth session token and return the user id
-async function getUserIdFromToken(
-  token: string,
-  env: Env,
-  request: Request,
-): Promise<string | undefined> {
+// Verify a BetterAuth session token and return the user id.
+// We query D1 directly rather than using auth.api.getSession() because
+// getSession() expects a signed cookie (token + HMAC signature) which we
+// don't have — we only have the raw token from the LiveStore syncPayload.
+async function getUserIdFromToken(token: string, env: Env): Promise<string | undefined> {
   try {
-    const auth = createAuth(env, request);
-    const session = await auth.api.getSession({
-      headers: new Headers({ cookie: `better-auth.session_token=${token}` }),
-    });
-    return session?.user?.id;
+    const result = await env.DB.prepare(
+      "SELECT userId FROM session WHERE token = ? AND expiresAt > ? LIMIT 1",
+    )
+      .bind(token, new Date().toISOString())
+      .first<{ userId: string }>();
+    return result?.userId ?? undefined;
   } catch {
     return undefined;
   }
@@ -158,6 +158,26 @@ export default {
 
     // Route /websocket to LiveStore sync — validatePayload has env in closure
     if (url.pathname === "/websocket" || url.pathname === "/") {
+      // Workaround for a double-encoding bug in @livestore/sync-cf@0.3.1:
+      // The client encodes the `payload` param twice (JSON → encodeURIComponent →
+      // encodeURIComponent again via UrlParams.toString). handleWebSocket only
+      // decodes once, leaving %7B...%7D instead of {...} and causing a 400.
+      // Fix: if the decoded payload value still looks URI-encoded, decode it once
+      // more so handleWebSocket receives a properly single-encoded value.
+      const rawPayload = url.searchParams.get("payload");
+      if (rawPayload !== null) {
+        try {
+          const onceDecoded = decodeURIComponent(rawPayload);
+          // If decoding again yields valid JSON, it was double-encoded — fix it.
+          JSON.parse(decodeURIComponent(onceDecoded));
+          const fixedUrl = new URL(url.toString());
+          fixedUrl.searchParams.set("payload", onceDecoded);
+          request = new Request(fixedUrl.toString(), request);
+        } catch {
+          // Already single-encoded or not JSON — leave the request as-is.
+        }
+      }
+
       return handleWebSocket(request, env, ctx, {
         headers: getCorsHeaders(request),
         validatePayload: async (payload) => {
@@ -170,7 +190,7 @@ export default {
             throw new Error("No storeId provided");
           }
 
-          const userId = await getUserIdFromToken(p.authToken, env, request);
+          const userId = await getUserIdFromToken(p.authToken, env);
 
           if (!userId) {
             throw new Error("Invalid or expired session token");

@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@marginelle/schema": "workspace:*",
     "@hookform/resolvers": "^5.2.2",
     "@livestore/adapter-web": "^0.3.1",
     "@livestore/livestore": "^0.3.1",
