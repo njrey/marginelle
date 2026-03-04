@@ -109,7 +109,18 @@ async function updateProgress(id: string, options: { page: string }): Promise<vo
 // ---------------------------------------------------------------------------
 
 export function registerBookCommands(program: Command): void {
-  const books = program.command("books").description("Manage books");
+  const books = program
+    .command("books")
+    .description(
+      "Manage books.\n\n" +
+        "A book is the top-level container for all notes and relationships.\n" +
+        "Create a book first, then use its ID with 'notes' and 'relationships' commands.\n\n" +
+        "Typical workflow:\n" +
+        "  1. marginelle books add --title 'Dune' --author 'Frank Herbert'\n" +
+        "  2. marginelle notes add --book <id> --type character --title 'Paul' --page 1\n" +
+        "  3. marginelle relationships add --from <noteId> --to <noteId> --type family --page 5\n\n" +
+        "Run 'marginelle workflow' for a full step-by-step guide.",
+    );
 
   books
     .command("list")

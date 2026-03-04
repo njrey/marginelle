@@ -7,13 +7,28 @@ compatibility_flags = ["nodejs_compat"]
 # Find it in Cloudflare Dashboard > Overview (right sidebar)
 account_id = "3f7282dd7e726f4414b70698b0b4fd5b"
 
+# DO class version history (see CLEAR_STORAGE.md for nuclear reset procedure):
+#   v1 — WebSocketServer   (original)
+#   v2 — WebSocketServerV2 (renamed from v1, March 2026)
+#   v3 — WebSocketServerV3 (renamed from v2, March 2026 — first stable sync)
+# To do a nuclear reset: add a v4 migration renaming V3→V4, update binding +
+# class name in index.ts, deploy, then follow CLEAR_STORAGE.md § Nuclear Reset.
+
 [[durable_objects.bindings]]
 name = "WEBSOCKET_SERVER"
-class_name = "WebSocketServer"
+class_name = "WebSocketServerV3"
 
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["WebSocketServer"]
+
+[[migrations]]
+tag = "v2"
+renamed_classes = [{from = "WebSocketServer", to = "WebSocketServerV2"}]
+
+[[migrations]]
+tag = "v3"
+renamed_classes = [{from = "WebSocketServerV2", to = "WebSocketServerV3"}]
 
 [[d1_databases]]
 binding = "DB"

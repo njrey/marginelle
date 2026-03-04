@@ -113,7 +113,26 @@ async function getUserIdFromToken(token: string, env: Env): Promise<string | und
   }
 }
 
-export class WebSocketServer extends makeDurableObject({}) {}
+const BaseDurableObject = makeDurableObject({});
+
+export class WebSocketServerV3 extends BaseDurableObject {
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
+    // webSocketMessage is a class field (arrow function) on the base class, not
+    // a prototype method, so override doesn't work. Patch the instance property
+    // here to wrap it in ctx.waitUntil(), ensuring the DO's background D1 write
+    // fiber completes even if the client closes the WebSocket immediately after
+    // receiving the PushAck.
+    const baseHandler = this.webSocketMessage.bind(this);
+    this.webSocketMessage = (ws: WebSocket, message: string | ArrayBuffer) => {
+      const result = baseHandler(ws, message);
+      if (result instanceof Promise) {
+        ctx.waitUntil(result);
+      }
+      return result;
+    };
+  }
+}
 
 const ALLOWED_ORIGINS = new Set([
   "http://localhost:60001",

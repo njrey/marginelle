@@ -174,27 +174,57 @@ async function deleteNote(id: string): Promise<void> {
 // Command registration
 // ---------------------------------------------------------------------------
 
+const NOTE_TYPE_DESCRIPTIONS: Record<NoteType, string> = {
+  character: "A person or sentient being in the story",
+  organization: "A group, faction, company, guild, or institution",
+  event: "A notable occurrence, battle, ceremony, or turning point",
+  location: "A place, region, building, or geographic feature",
+  item: "A physical object, artifact, weapon, or possession",
+  concept: "An abstract idea, theme, magic system, law, or belief",
+};
+
 export function registerNoteCommands(program: Command): void {
-  const notes = program.command("notes").description("Manage notes");
+  const typeList = NOTE_TYPES.map((t) => `  ${t.padEnd(14)} ${NOTE_TYPE_DESCRIPTIONS[t]}`).join(
+    "\n",
+  );
+
+  const notes = program
+    .command("notes")
+    .description(
+      "Manage notes for a book.\n\n" +
+        "A note captures anything worth tracking while reading — characters, places,\n" +
+        "organizations, events, items, or abstract concepts. Each note belongs to a\n" +
+        "book and records the page where it was first encountered.\n\n" +
+        "Note types:\n" +
+        typeList +
+        "\n\n" +
+        "After creating notes you can link them together with 'relationships'.\n" +
+        "Example: create a note for 'Gandalf' and one for 'Frodo', then add a\n" +
+        "relationship of type 'friend' between them.\n\n" +
+        "Run 'marginelle workflow' for a full step-by-step guide.",
+    );
 
   notes
     .command("list")
     .description("List notes for a book")
     .requiredOption("-b, --book <id>", "Book ID")
-    .option("-t, --type <type>", `Filter by note type (${NOTE_TYPES.join("|")})`)
-    .option("-p, --page <number>", "Only show notes discovered up to this page")
+    .option("-t, --type <type>", `Filter by note type. Valid values: ${NOTE_TYPES.join(", ")}`)
+    .option("-p, --page <number>", "Only show notes discovered up to this page number")
     .action(async (options: { book: string; type?: string; page?: string }) => {
       await listNotes(options);
     });
 
   notes
     .command("add")
-    .description("Add a note to a book")
-    .requiredOption("-b, --book <id>", "Book ID")
-    .requiredOption("-t, --type <type>", `Note type (${NOTE_TYPES.join("|")})`)
-    .requiredOption("--title <title>", "Note title")
-    .option("-c, --content <text>", "Note content / description")
-    .requiredOption("-p, --page <number>", "Page number where this was discovered")
+    .description("Add a note to a book.\n\n" + "Note types:\n" + typeList)
+    .requiredOption("-b, --book <id>", "Book ID (from 'marginelle books list')")
+    .requiredOption(
+      "-t, --type <type>",
+      `What kind of thing this note is about. Valid values: ${NOTE_TYPES.join(", ")}`,
+    )
+    .requiredOption("--title <title>", "Short name or title for the note (e.g. character name)")
+    .option("-c, --content <text>", "Longer description or notes about this entry")
+    .requiredOption("-p, --page <number>", "Page number where this was first encountered")
     .action(
       async (options: {
         book: string;
@@ -209,24 +239,24 @@ export function registerNoteCommands(program: Command): void {
 
   notes
     .command("show <id>")
-    .description("Show a single note by ID")
+    .description("Show a single note by ID, including its type, content, and page number")
     .action(async (id: string) => {
       await showNote(id);
     });
 
   notes
     .command("update <id>")
-    .description("Update a note")
+    .description("Update the title, content, or type of an existing note")
     .option("--title <title>", "New title")
-    .option("-c, --content <text>", "New content")
-    .option("-t, --type <type>", `New type (${NOTE_TYPES.join("|")})`)
+    .option("-c, --content <text>", "New content / description")
+    .option("-t, --type <type>", `Change the note type. Valid values: ${NOTE_TYPES.join(", ")}`)
     .action(async (id: string, options: { title?: string; content?: string; type?: string }) => {
       await updateNote(id, options);
     });
 
   notes
     .command("delete <id>")
-    .description("Delete a note and its relationships")
+    .description("Delete a note and all relationships that involve it (cascade delete)")
     .action(async (id: string) => {
       await deleteNote(id);
     });

@@ -119,30 +119,75 @@ async function deleteRelationship(id: string): Promise<void> {
   });
 }
 
+const RELATIONSHIP_TYPE_DESCRIPTIONS: Record<RelationshipType, string> = {
+  ally: "Two characters or groups that support each other",
+  enemy: "Two characters or groups in opposition or conflict",
+  family: "A blood or legal family connection (parent, sibling, spouse, etc.)",
+  friend: "A close personal friendship",
+  member_of: "A character belongs to an organization or group",
+  owns: "A character or group possesses an item or location",
+  located_in: "A character, item, or organization is situated in a location",
+  impacts: "One entity has a significant effect on another (general-purpose)",
+  causes: "One event or entity directly causes another event or outcome",
+};
+
 // ---------------------------------------------------------------------------
 // Command registration
 // ---------------------------------------------------------------------------
 
 export function registerRelationshipCommands(program: Command): void {
-  const relationships = program.command("relationships").description("Manage note relationships");
+  const typeList = RELATIONSHIP_TYPES.map(
+    (t) => `  ${t.padEnd(14)} ${RELATIONSHIP_TYPE_DESCRIPTIONS[t]}`,
+  ).join("\n");
+
+  const relationships = program
+    .command("relationships")
+    .description(
+      "Manage relationships between notes.\n\n" +
+        "A relationship links two notes together and describes how they are connected.\n" +
+        "Both notes must already exist (create them with 'marginelle notes add' first).\n\n" +
+        "Relationship types:\n" +
+        typeList +
+        "\n\n" +
+        "Workflow example:\n" +
+        "  # 1. Create notes for two characters\n" +
+        "  marginelle notes add --book <bookId> --type character --title 'Frodo' --page 1\n" +
+        "  marginelle notes add --book <bookId> --type character --title 'Sam' --page 1\n\n" +
+        "  # 2. Link them with a relationship\n" +
+        "  marginelle relationships add --from <frodoId> --to <samId> --type friend --page 10\n\n" +
+        "  # 3. A character can also belong to an organization\n" +
+        "  marginelle notes add --book <bookId> --type organization --title 'The Fellowship' --page 20\n" +
+        "  marginelle relationships add --from <frodoId> --to <fellowshipId> --type member_of --page 20\n\n" +
+        "Run 'marginelle workflow' for a full step-by-step guide.",
+    );
 
   relationships
     .command("list")
-    .description("List relationships for a book")
+    .description("List all relationships for a book")
     .requiredOption("-b, --book <id>", "Book ID")
-    .option("-p, --page <number>", "Only show relationships discovered up to this page")
+    .option("-p, --page <number>", "Only show relationships discovered up to this page number")
     .action(async (options: { book: string; page?: string }) => {
       await listRelationships(options);
     });
 
   relationships
     .command("add")
-    .description("Create a relationship between two notes")
-    .requiredOption("--from <noteId>", "Source note ID")
-    .requiredOption("--to <noteId>", "Target note ID")
-    .requiredOption("-t, --type <type>", `Relationship type (${RELATIONSHIP_TYPES.join("|")})`)
-    .option("-d, --description <text>", "Optional description")
-    .requiredOption("-p, --page <number>", "Page number where this relationship was discovered")
+    .description(
+      "Create a directed relationship between two notes.\n\n" +
+        "Both --from and --to must be valid note IDs (use 'marginelle notes list --book <id>').\n" +
+        "The direction is meaningful: --from is the subject, --to is the object.\n" +
+        "Example: Frodo (--from) member_of Fellowship (--to)\n\n" +
+        "Relationship types:\n" +
+        typeList,
+    )
+    .requiredOption("--from <noteId>", "ID of the source note (the subject of the relationship)")
+    .requiredOption("--to <noteId>", "ID of the target note (the object of the relationship)")
+    .requiredOption(
+      "-t, --type <type>",
+      `How the two notes are related. Valid values: ${RELATIONSHIP_TYPES.join(", ")}`,
+    )
+    .option("-d, --description <text>", "Optional free-text description of this relationship")
+    .requiredOption("-p, --page <number>", "Page number where this relationship was first evident")
     .action(
       async (options: {
         from: string;
@@ -157,7 +202,7 @@ export function registerRelationshipCommands(program: Command): void {
 
   relationships
     .command("delete <id>")
-    .description("Delete a relationship")
+    .description("Delete a relationship by its ID (does not delete the notes themselves)")
     .action(async (id: string) => {
       await deleteRelationship(id);
     });
