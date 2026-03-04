@@ -142,7 +142,7 @@ export function CharacterGraph({
     const orgLinkLayer = g.append("g").attr("class", "org-links");
     const linkLayer = g.append("g").attr("class", "links");
     const nodeLayer = g.append("g").attr("class", "nodes");
-    const tooltipLayer = g.append("g").attr("class", "tooltips");
+    g.append("g").attr("class", "tooltips");
 
     // Create copies to avoid mutating props
     const nodesCopy: ForceNode[] = nodes.map((d) => ({ ...d }));
@@ -214,7 +214,7 @@ export function CharacterGraph({
       .style("white-space", "nowrap");
 
     edgeHitArea
-      .on("mouseover", function (event: MouseEvent, d: GraphEdge) {
+      .on("mouseover", function (_event: MouseEvent, d: GraphEdge) {
         const cfg = EDGE_TYPE_CONFIG[d.relationshipType];
         tooltip
           .style("opacity", "1")
